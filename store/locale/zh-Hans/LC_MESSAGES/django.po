@@ -1,0 +1,187 @@
+﻿# SOME DESCRIPTIVE TITLE.
+# Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
+# This file is distributed under the same license as the PACKAGE package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
+#
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: PACKAGE VERSION\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2016-10-11 17:27+0800\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+
+#: .\store\models.py:11 .\store\models.py:132 .\store\models.py:158
+msgid "customer name"
+msgstr "客户名字"
+
+#: .\store\models.py:12
+msgid "customer address"
+msgstr "联系地址"
+
+#: .\store\models.py:13
+msgid "customer phone number"
+msgstr "电话号码"
+
+#: .\store\models.py:14 .\store\models.py:26
+msgid "add date"
+msgstr "添加日期"
+
+#: .\store\models.py:24
+msgid "category description"
+msgstr "描述信息"
+
+#: .\store\models.py:25
+msgid "category name"
+msgstr "种类名称"
+
+#: .\store\models.py:36 .\store\models.py:68 .\store\models.py:82
+#: .\store\models.py:102 .\store\models.py:119 .\store\models.py:152
+msgid "good name"
+msgstr "商品名称"
+
+#: .\store\models.py:37 .\store\models.py:155
+msgid "average price"
+msgstr "进价"
+
+#: .\store\models.py:38
+msgid "current price"
+msgstr "卖价"
+
+#: .\store\models.py:39
+msgid "add people"
+msgstr "操作人员"
+
+#: .\store\models.py:40 .\store\models.py:72
+msgid "update date"
+msgstr "更新日期"
+
+#: .\store\models.py:41
+msgid "recent sell"
+msgstr "最近售卖"
+
+#: .\store\models.py:42
+msgid "is delete"
+msgstr "下架与否"
+
+#: .\store\models.py:43
+msgid "category"
+msgstr "种类"
+
+#: .\store\models.py:49
+#, fuzzy
+#| msgid "good name"
+msgid "good"
+msgstr "商品名称"
+
+#: .\store\models.py:50
+msgid "goods"
+msgstr "商品表"
+
+#: .\store\models.py:57 .\store\models.py:69 .\store\models.py:83
+#: .\store\models.py:103 .\store\models.py:153
+msgid "shop name"
+msgstr "进货商名称"
+
+#: .\store\models.py:58
+msgid "shop address"
+msgstr "进货商地址"
+
+#: .\store\models.py:70
+msgid "remain"
+msgstr "描述信息"
+
+#: .\store\models.py:71
+msgid "updater"
+msgstr "更改人员"
+
+#: .\store\models.py:84
+msgid "number"
+msgstr "数目"
+
+#: .\store\models.py:85
+msgid "price"
+msgstr "价格"
+
+#: .\store\models.py:86 .\store\models.py:135 .\store\models.py:159
+msgid "description"
+msgstr "描述信息"
+
+#: .\store\models.py:87 .\store\models.py:106 .\store\models.py:121
+#: .\store\models.py:140 .\store\models.py:161
+msgid "operator"
+msgstr "操作人员"
+
+#: .\store\models.py:88 .\store\models.py:107 .\store\models.py:122
+#: .\store\models.py:141 .\store\models.py:162
+msgid "datetime"
+msgstr "日期"
+
+#: .\store\models.py:104
+msgid "amount"
+msgstr "总数"
+
+#: .\store\models.py:105
+msgid "return record type"
+msgstr "退订类型"
+
+#: .\store\models.py:117
+msgid "from shop name"
+msgstr "供货商"
+
+#: .\store\models.py:118
+msgid "to shop name"
+msgstr "进货商"
+
+#: .\store\models.py:120
+msgid "change numbers"
+msgstr "数目"
+
+#: .\store\models.py:129
+msgid "name"
+msgstr "名称"
+
+#: .\store\models.py:130
+msgid "ad title"
+msgstr "广告头部"
+
+#: .\store\models.py:131 .\store\models.py:157
+msgid "arrears or not"
+msgstr "是否欠款"
+
+#: .\store\models.py:133
+msgid "phone number"
+msgstr "手机号码"
+
+#: .\store\models.py:134
+msgid "address"
+msgstr "联系地址"
+
+#: .\store\models.py:137
+msgid "total price"
+msgstr "总价"
+
+#: .\store\models.py:138
+msgid "total profit"
+msgstr "总利润"
+
+#: .\store\models.py:139 .\store\models.py:160
+msgid "delete or not"
+msgstr "下架与否"
+
+#: .\store\models.py:142
+msgid "arrears price"
+msgstr "拖欠数目"
+
+#: .\store\models.py:154
+msgid "sell numbers"
+msgstr "卖出数目"
+
+#: .\store\models.py:156
+msgid "sell price"
+msgstr "出售价格"

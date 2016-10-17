@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+</head>
+<body>
+<h1>{{ report.title }}</h1>
+<div class="ad-title">{{ report.ad }}</div>
+<div class="title"><ul><li><label>客户：</label><input type="input"></li>
+    <li><label>电话：</label><input type="input"></li><li>2016年10月17日</li></ul></div>
+
+<table><thead><tr><td>名称</td><td>单位</td><td>数量</td><td>单价</td><td>金额</td></tr></thead>
+<tbody>
+{% for item in data %}
+    <tr><td>{{ item.goods_name }}</td><td>{{ item.unit_name }}</td>
+        <td>{{ item.num }}</td><td>{{ item.last_price }}</td><td>{{ item.count }}</td></tr>
+{% endfor %}
+</tbody>
+</table>
+<div class="count"><div>付款方式</div><div>合计:</div></div>
+<div>地址:{{ report.address }}</div>
+<div>{{ report.remark }}</div>
+<div>电话:{{ report.phone }}</div>
+</body>
+</html>

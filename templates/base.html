@@ -1,0 +1,20 @@
+{% load i18n static %}
+<!DOCTYPE html>
+{% get_current_language as LANGUAGE_CODE %}
+<html lang="{{ LANGUAGE_CODE|default:"en-us" }}">
+<head>
+    <meta charset="UTF-8">
+    {% block tilte %}<title>志平电子批发商城</title>{% endblock %}
+</head>
+<body>
+{% block content %}
+{% block header %}<h1>志平电子批发商城</h1>{% endblock %}
+{% block sidebar %}
+{% endblock %}
+{% block itemlist %}
+{% endblock %}
+{% block footbar %}
+{% endblock footbar %}
+{% endblock content %}
+</body>
+</html>
