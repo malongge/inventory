@@ -15,6 +15,10 @@
 {#            font-size: 1.2rem;#}
         }
 
+        .container h1 {
+            font-weight: 900;
+        }
+
         .width {
             width: 80%;
             margin: auto;
@@ -153,6 +157,7 @@ window.print();
     <table class="width">
         <thead>
         <tr>
+            <td>编号</td>
             <td>名称</td>
             <td>单位</td>
             <td>数量</td>
@@ -163,6 +168,7 @@ window.print();
         <tbody>
         {% for item in data %}
             <tr>
+                <td>{{ item.code }}</td>
                 <td>{{ item.goods_name }}</td>
                 <td>{{ item.unit_name }}</td>
                 <td>{{ item.num }}</td>
@@ -177,9 +183,10 @@ window.print();
                 <td></td>
                 <td></td>
                 <td></td>
+                <td></td>
             </tr>
         {% endfor %}
-        <tr><td colspan="3" style="text-align: left">付款方式:</td><td colspan="2">合计:<p id="count-all">{{ price }}</p>￥</td></tr>
+        <tr><td colspan="4" style="text-align: left">付款方式:</td><td colspan="2">合计:<p id="count-all">{{ price }}</p>￥</td></tr>
         </tbody>
     </table>
     </div>

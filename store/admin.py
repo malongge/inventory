@@ -239,9 +239,11 @@ class OrderAdmin(OrderMixin, admin.ModelAdmin):
         data = []
         all_price = 0.0
         cell_num = 0
+        code = 1
         for key, value in json.loads(request.POST['data_list']).items():
             g = Goods.objects.get(id=key)
             g.num = value
+            g.code = code
             data.append(g)
             all_price += value * g.last_price
             g.remain = g.remain - g.num
@@ -251,6 +253,7 @@ class OrderAdmin(OrderMixin, admin.ModelAdmin):
                                            average_price=g.average_price,
                                            sell_price=g.last_price)
             cell_num += 1
+            code += 1
 
 
         default_report = Report.objects.filter(tag=True).order_by('-date')[0]
