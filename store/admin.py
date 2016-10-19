@@ -7,7 +7,7 @@ from django.core.exceptions import ValidationError
 class GoddsAdmin(admin.ModelAdmin):
     fieldsets = (
         (None, {
-            'fields': ('goods_name', 'average_price', 'last_price', 'remain', 'category')
+            'fields': ('goods_name', 'average_price', 'last_price', 'unit_name', 'remain', 'category')
         }),
         ('选填项', {
             'classes': ('collapse',),
@@ -15,7 +15,7 @@ class GoddsAdmin(admin.ModelAdmin):
         }),
     )
     list_display = (
-    'goods_name', 'average_price', 'last_price',  'remain', 'recent_sell', 'is_delete', 'add_people', 'update_date')
+    'goods_name', 'unit_name', 'average_price', 'last_price',  'remain', 'recent_sell', 'is_delete', 'add_people', 'update_date')
     list_filter = ['category']
     search_fields = ['goods_name']
 
