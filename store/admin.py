@@ -156,33 +156,22 @@ class TransferGoodsAdmin(admin.ModelAdmin):
 class GoodsSellRecordAdmin(admin.ModelAdmin):
     fieldsets = (
         (None, {
-            'fields': ('goods', 'shop', 'sell_num', 'customer')
+            'fields': ('customer', 'remark')
         }),
         ('选填项', {
             'classes': ('collapse',),
-            'fields': ('remark', 'is_arrears', 'arrears_price', 'average_price', 'sell_price',)
+            'fields': ('is_arrears', 'arrears_price')
         }),
     )
-    list_display = ('goods', 'shop', 'sell_num', 'average_price', 'sell_price', 'customer', 'is_arrears',
+    list_display = ('goods', 'sell_num', 'average_price', 'sell_price', 'customer', 'is_arrears',
                     'arrears_price', 'remark', 'updater', 'date')
-    search_fields = ['goods', 'shop']
+    search_fields = ['goods']
 
     @transaction.atomic
     def save_model(self, request, obj, form, change):
         if getattr(obj, 'updater', None) is None:
             obj.updater = request.user
-        records = Goods.objects.filter(pk=obj.goods.id)
-        if records:
-            record = records[0]
-            record.remain = record.remain - obj.sell_num
-            if record.remain < 0:
-                raise ValidationError("库存不够，需要补充库存")
-            record.save()
-            # goods = Goods.objects.get(goods=obj.goods)
-            obj.average_price = obj.goods.average_price
-            obj.sell_price = obj.goods.last_price
-        else:
-            raise ValidationError("库存中还没有这个商品， 无法销售")
+
         obj.save()
 
 
@@ -254,12 +243,12 @@ class OrderAdmin(OrderMixin, admin.ModelAdmin):
             g.num = value
             data.append(g)
             all_price += value * g.last_price
-
-        # for obj in Goods.objects.all():
-        #     obj.num = 1
-        #     data.append(obj)
-        #
-        #     all_price += obj.num * obj.last_price
+            g.remain = g.remain - g.num
+            g.save()
+            GoodsSellRecord.objects.create(goods=g, sell_num=value,
+                                           updater=request.user,
+                                           average_price=g.average_price,
+                                           sell_price=g.last_price)
 
 
         default_report = Report.objects.filter(tag=True).order_by('-date')[0]

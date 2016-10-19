@@ -218,12 +218,11 @@ class GoodsSellRecord(models.Model):
     卖出商品记录
     """
     goods = models.ForeignKey(Goods, verbose_name='商品名称', related_name='goods')
-    shop = models.ForeignKey(Shop, verbose_name='供应商', related_name='shop')
     sell_num = models.IntegerField('销售数目')
-    average_price = models.FloatField('调整进价', null=True, blank=True)
-    sell_price = models.FloatField('调整售价', null=True, blank=True)
-    is_arrears = models.BooleanField('是否欠款')  # 是否欠款
-    customer = models.ForeignKey(Customer, verbose_name='客户姓名', related_name='customer')
+    average_price = models.FloatField('进价', null=True, blank=True)
+    sell_price = models.FloatField('售价', null=True, blank=True)
+    is_arrears = models.BooleanField('是否欠款', default=False)  # 是否欠款
+    customer = models.ForeignKey(Customer, verbose_name='客户姓名', related_name='customer', null=True, blank=True)
     remark = models.TextField('描述信息', blank=True, null=True)
     updater = models.ForeignKey(User, verbose_name='操作人员', related_name='admin')
     date = models.DateTimeField('日期', auto_now_add=True)
@@ -253,4 +252,4 @@ class GoodsSellRecord(models.Model):
         ordering = ['goods', 'sell_num']
 
     def __str__(self):
-        return "%s--%s" % (self.shop, self.goods)
+        return self.goods.goods_name
