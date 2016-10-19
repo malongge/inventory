@@ -2,7 +2,7 @@ from django.contrib import admin
 from .models import *
 from django.db import transaction
 from django.core.exceptions import PermissionDenied
-
+from django.core.exceptions import ValidationError
 
 class GoddsAdmin(admin.ModelAdmin):
     fieldsets = (
@@ -87,11 +87,15 @@ class GoodsAddRecordAdmin(admin.ModelAdmin):
     def save_model(self, request, obj, form, change):
         if getattr(obj, 'updater', None) is None:
             obj.updater = request.user
-        records = Goods.objects.filter(goods=obj.goods)
+        # import pdb
+        # pdb.set_trace()
+        records = Goods.objects.filter(pk=obj.goods.id)
         if records:
             record = records[0]
 
             if obj.new_price:
+                if obj.new_price == 0:
+                    raise ValidationError('修改的价格不能为0')
                 record.average_price = (obj.new_price * obj.number + record.remain * record.average_price) / \
                                        (record.remain + obj.number)
             record.remain = record.remain + obj.number
@@ -118,13 +122,13 @@ class ReturnRecordAdmin(admin.ModelAdmin):
     def save_model(self, request, obj, form, change):
         if getattr(obj, 'updater', None) is None:
             obj.updater = request.user
-        records = Goods.objects.filter(goods=obj.goods, shop=obj.shop)
+        records = Goods.objects.filter(pk=obj.goods.id)
         if records:
             record = records[0]
             record.remain = record.remain + obj.amount
             record.save()
         else:
-            raise Exception("库存中还没有这个商品无法进行退送")
+            raise ValidationError("库存中还没有这个商品无法进行退送")
         obj.save()
 
 
@@ -167,18 +171,18 @@ class GoodsSellRecordAdmin(admin.ModelAdmin):
     def save_model(self, request, obj, form, change):
         if getattr(obj, 'updater', None) is None:
             obj.updater = request.user
-        records = Goods.objects.filter(goods=obj.goods, shop=obj.shop)
+        records = Goods.objects.filter(pk=obj.goods.id)
         if records:
             record = records[0]
             record.remain = record.remain - obj.sell_num
             if record.remain < 0:
-                raise PermissionDenied("库存不够，需要补充库存")
+                raise ValidationError("库存不够，需要补充库存")
             record.save()
             # goods = Goods.objects.get(goods=obj.goods)
             obj.average_price = obj.goods.average_price
             obj.sell_price = obj.goods.last_price
         else:
-            raise PermissionDenied("库存中还没有这个商品， 无法销售")
+            raise ValidationError("库存中还没有这个商品， 无法销售")
         obj.save()
 
 
@@ -211,6 +215,12 @@ class OrderAdmin(OrderMixin, admin.ModelAdmin):
         extra_context = {'categories': categories, 'goods': goods}
         return super(OrderAdmin, self).changelist_view(request, extra_context)
 
+    def add_view(self, request, form_url='', extra_context=None):
+        return super(OrderAdmin, self).changeform_view(request, None, form_url, extra_context)
+
+    def change_view(self, request, object_id, form_url='', extra_context=None):
+        return super(OrderAdmin, self).changeform_view(request, object_id, form_url, extra_context)
+
     def goods_list_view(self, request, cat_id):
         goods = Goods.objects.filter(category=cat_id)
         ret = []
@@ -238,17 +248,23 @@ class OrderAdmin(OrderMixin, admin.ModelAdmin):
 
     def report_view(self, request):
         data = []
-        # for key, value in json.loads(request.POST['data_list']).items():
-        #     g = Goods.objects.get(id=key)
-        #     g.num = value
-        #     data.append(g)
-        for obj in Goods.objects.all():
-            obj.num = 1
-            data.append(obj)
+        all_price = 0.0
+        for key, value in json.loads(request.POST['data_list']).items():
+            g = Goods.objects.get(id=key)
+            g.num = value
+            data.append(g)
+            all_price += value * g.last_price
+
+        # for obj in Goods.objects.all():
+        #     obj.num = 1
+        #     data.append(obj)
+        #
+        #     all_price += obj.num * obj.last_price
+
 
         default_report = Report.objects.filter(tag=True).order_by('-date')[0]
 
-        return render(request, context={'data': data, 'report': default_report}, template_name=self.report_template)
+        return render(request, context={'data': data, 'report': default_report, 'price': all_price}, template_name=self.report_template)
 
 class ReportAdmin(admin.ModelAdmin):
     list_display = ('title', 'alias', 'ad', 'phone', 'address', 'remark', 'date',

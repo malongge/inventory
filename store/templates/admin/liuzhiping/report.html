@@ -1,26 +1,196 @@
+{% load store_tag %}
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <title>Title</title>
+    <style type="text/css">
+        {#        .container {#}
+        {#            margin: auto;#}
+        {#            vertical-align: middle;#}
+        {#        }#}
+        .container {
+            width: 90%;
+{#            height: 80px;#}
+            background: #f8f8f8;
+            margin: auto;
+            padding-top: 10px;
+            text-align: center;
+            font-size: 1.5rem;
+        }
+
+        .width {
+            width: 80%;
+            margin: auto;
+        }
+
+        .ad-title {
+{#            width: 500px;#}
+{#            margin: auto;#}
+            margin-bottom: 10px;
+        }
+
+        .title {
+            padding-bottom: 5px;
+            overflow: hidden;
+            margin-bottom: 10px;
+        }
+
+        .title ul {
+            display: block;
+            list-style-type: none;
+{#            height: 30px;#}
+            clear: both;
+        }
+
+        ul li {
+    display: block;
+    float: left;
+    margin-left: 5px;
+        }
+
+        .data-list {
+            clear: both;
+        }
+
+        .data-list table {
+{#            width: 500px;#}
+{#            margin: auto;#}
+            border: 1px solid;
+            border-collapse: collapse;
+        }
+
+        table thead {
+            margin: 2px 0;
+            font-size: 1.7rem;
+            font-weight: bold;
+        }
+
+        td {
+            border: 1px solid;
+        }
+
+        .count {
+{#        margin: auto;#}
+{#        width: 500px;#}
+        }
+
+        .count div {
+            border: 1px solid;
+            border-top-style: none;
+            text-align: left;
+{#            padding-left: 10px;#}
+        }
+        #count-all {
+            margin-left: 7px;
+            margin-right: 2px;
+            display: inline;
+            height: inherit;
+        }
+
+        input {
+            border:0;
+            border-bottom:1px solid black;
+            background-color: inherit;
+            width: 100px;
+            padding-right: 10px;
+        }
+
+        .time {
+            font-size: 0.8rem;
+            margin-left: 30px;
+        }
+
+        .footer {
+{#            width: 500px;#}
+{#            margin: auto;#}
+             width: 70%;
+            margin: auto;
+            text-align: left;
+            margin-top: 20px;
+        }
+
+        @page
+    {
+        size:  auto;   /* auto is the initial value */
+        margin: 0mm;  /* this affects the margin in the printer settings */
+    }
+    </style>
+    <script type="text/javascript">
+function doPrint() {
+bdhtml=window.document.body.innerHTML;
+sprnstr="<!--startprint-->";
+eprnstr="<!--endprint-->";
+prnhtml=bdhtml.substr(bdhtml.indexOf(sprnstr)+17);
+prnhtml=prnhtml.substring(0,prnhtml.indexOf(eprnstr));
+window.document.body.innerHTML=prnhtml;
+{#    pagesetup_null();#}
+window.print();
+   }
+{#    var hkey_root,hkey_path,hkey_key;#}
+{#hkey_root="HKEY_CURRENT_USER";#}
+{#hkey_path="\\Software\\Microsoft\\Internet Explorer\\PageSetup\\";#}
+{#//设置网页打印的页眉页脚为空#}
+{#function pagesetup_null(){#}
+{#try{#}
+{#var RegWsh = new ActiveXObject("WScript.Shell");#}
+{#hkey_key="header" ;#}
+{#RegWsh.RegWrite(hkey_root+hkey_path+hkey_key,"");#}
+{#hkey_key="footer";#}
+{#RegWsh.RegWrite(hkey_root+hkey_path+hkey_key,"")#}
+{#}catch(e){}#}
+{#}#}
+
+</script>
 </head>
 <body>
-<h1>{{ report.title }}</h1>
-<div class="ad-title">{{ report.ad }}</div>
-<div class="title"><ul><li><label>客户：</label><input type="input"></li>
-    <li><label>电话：</label><input type="input"></li><li>2016年10月17日</li></ul></div>
+<!--startprint-->
+<div class="container">
+    <h1>{{ report.title }}</h1>
+    <div class="ad-title width">{{ report.ad }}</div>
+    <div class="title width">
+        <ul>
+            <li><label>客户：</label><input type="input"></li>
+            <li><label>电话：</label><input type="input"></li>
+            <li class="time">{% my_time %}</li>
+        </ul>
+    </div>
+    <div class="data-list">
+    <table class="width">
+        <thead>
+        <tr>
+            <td>名称</td>
+            <td>单位</td>
+            <td>数量</td>
+            <td>单价</td>
+            <td>金额</td>
+        </tr>
+        </thead>
+        <tbody>
+        {% for item in data %}
+            <tr>
+                <td>{{ item.goods_name }}</td>
+                <td>{{ item.unit_name }}</td>
+                <td>{{ item.num }}</td>
+                <td>{{ item.last_price }}</td>
+                <td>{{ item.count }}</td>
+            </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+    </div>
+    <div class="count width">
+        <div>付款方式:</div>
+        <div>合计:<p id="count-all">{{ price }}</p>￥</div>
+    </div>
+    <div class="footer">地址:{{ report.address }}</div>
+    <div class="footer">{{ report.remark | linebreaksbr }}</div>
+    <div class="footer">电话:{{ report.phone }}</div>
+</div>
+<!--endprint-->
+{#<div style="margin: auto; width: 500px;"><a href="javascript:void(0);" style="display: block; float: right" onClick="doPrint()">打印</a></div>#}
 
-<table><thead><tr><td>名称</td><td>单位</td><td>数量</td><td>单价</td><td>金额</td></tr></thead>
-<tbody>
-{% for item in data %}
-    <tr><td>{{ item.goods_name }}</td><td>{{ item.unit_name }}</td>
-        <td>{{ item.num }}</td><td>{{ item.last_price }}</td><td>{{ item.count }}</td></tr>
-{% endfor %}
-</tbody>
-</table>
-<div class="count"><div>付款方式</div><div>合计:</div></div>
-<div>地址:{{ report.address }}</div>
-<div>{{ report.remark }}</div>
-<div>电话:{{ report.phone }}</div>
+
 </body>
+
 </html>

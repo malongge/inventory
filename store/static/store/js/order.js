@@ -117,7 +117,8 @@
 
         function StandardPost (url,args)
         {
-        var form = $("<form method='post'></form>");
+            // var body = $(document.body);
+        var form = $("<form method='post' style='display: none;'></form>");
         form.attr({"action":url});
             var input = $("<input type='hidden'>");
             input.attr({"name":'data_list'});
@@ -127,12 +128,15 @@
             token.attr({'name': 'csrfmiddlewaretoken'});
             token.val(window.CSRF_TOKEN);
             form.append(token);
+            form.appendTo(document.body);
         form.submit();
+            document.body.removeChild(form[0]);
         }
 
         $('.print-link').click(function () {
             console.log(JSON.stringify(report_ids));
-            StandardPost(window.report_url, JSON.stringify(report_ids))
+            StandardPost(window.report_url, JSON.stringify(report_ids));
+            report_ids = {}
         })
     });
 })(django.jQuery);
