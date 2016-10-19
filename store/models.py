@@ -70,6 +70,7 @@ class Goods(models.Model):
     category = models.ManyToManyField(Category, verbose_name='所属类别')
     shop = models.ForeignKey(Shop, verbose_name='供应商名称', blank=True, null=True)
     remain = models.IntegerField('库存量', default=0)
+    last_time = models.DateField('有效期', blank=True, null=True)
 
     def __str__(self):
         return self.goods_name
@@ -77,7 +78,7 @@ class Goods(models.Model):
     class Meta:
         verbose_name = '商品'
         verbose_name_plural = '商品'
-        ordering = ['goods_name', 'update_date']
+        ordering = ['last_time', 'goods_name', 'update_date']
 
     @property
     def count(self):
