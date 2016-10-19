@@ -238,6 +238,7 @@ class OrderAdmin(OrderMixin, admin.ModelAdmin):
     def report_view(self, request):
         data = []
         all_price = 0.0
+        cell_num = 0
         for key, value in json.loads(request.POST['data_list']).items():
             g = Goods.objects.get(id=key)
             g.num = value
@@ -249,11 +250,14 @@ class OrderAdmin(OrderMixin, admin.ModelAdmin):
                                            updater=request.user,
                                            average_price=g.average_price,
                                            sell_price=g.last_price)
+            cell_num += 1
 
 
         default_report = Report.objects.filter(tag=True).order_by('-date')[0]
 
-        return render(request, context={'data': data, 'report': default_report, 'price': all_price}, template_name=self.report_template)
+
+        return render(request, context={'data': data, 'report': default_report, 'price': all_price,
+                                        'cell_num': range(max(15-cell_num, 0))}, template_name=self.report_template)
 
 class ReportAdmin(admin.ModelAdmin):
     list_display = ('title', 'alias', 'ad', 'phone', 'address', 'remark', 'date',

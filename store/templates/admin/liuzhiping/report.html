@@ -5,18 +5,14 @@
     <meta charset="UTF-8">
     <title>Title</title>
     <style type="text/css">
-        {#        .container {#}
-        {#            margin: auto;#}
-        {#            vertical-align: middle;#}
-        {#        }#}
+
         .container {
             width: 90%;
-{#            height: 80px;#}
             background: #f8f8f8;
             margin: auto;
             padding-top: 10px;
             text-align: center;
-            font-size: 1.5rem;
+{#            font-size: 1.2rem;#}
         }
 
         .width {
@@ -25,21 +21,18 @@
         }
 
         .ad-title {
-{#            width: 500px;#}
-{#            margin: auto;#}
-            margin-bottom: 10px;
+
         }
 
         .title {
             padding-bottom: 5px;
             overflow: hidden;
-            margin-bottom: 10px;
+            margin-bottom: 3px;
         }
 
         .title ul {
             display: block;
             list-style-type: none;
-{#            height: 30px;#}
             clear: both;
         }
 
@@ -62,12 +55,13 @@
 
         table thead {
             margin: 2px 0;
-            font-size: 1.7rem;
+            font-size: 1.2rem;
             font-weight: bold;
         }
 
         td {
             border: 1px solid;
+            min-height: 1rem;
         }
 
         .count {
@@ -176,13 +170,23 @@ window.print();
                 <td>{{ item.count }}</td>
             </tr>
         {% endfor %}
+        {% for _ in cell_num %}
+            <tr>
+                <td>&nbsp;</td>
+                <td></td>
+                <td></td>
+                <td></td>
+                <td></td>
+            </tr>
+        {% endfor %}
+        <tr><td colspan="3" style="text-align: left">付款方式:</td><td colspan="2">合计:<p id="count-all">{{ price }}</p>￥</td></tr>
         </tbody>
     </table>
     </div>
-    <div class="count width">
-        <div>付款方式:</div>
-        <div>合计:<p id="count-all">{{ price }}</p>￥</div>
-    </div>
+{#    <div class="count width">#}
+{#        <div style="text-align: left">付款方式:</div>#}
+{#        <div>合计:<p id="count-all">{{ price }}</p>￥</div>#}
+{#    </div>#}
     <div class="footer">地址:{{ report.address }}</div>
     <div class="footer">{{ report.remark | linebreaksbr }}</div>
     <div class="footer">电话:{{ report.phone }}</div>
