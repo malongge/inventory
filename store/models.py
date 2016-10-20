@@ -2,17 +2,29 @@ from django.db import models
 from django.contrib.auth.models import User
 from django.utils.translation import gettext_lazy as _
 # Create your models here.
+def modify_fields(**kwargs):
+    def wrap(cls):
+        for field, prop_dict in kwargs.items():
+            for prop, val in prop_dict.items():
+                setattr(cls._meta.get_field(field), prop, val)
+        return cls
+    return wrap
 
 
-class Customer(models.Model):
-    """
-    购买商品的客户
-    """
-    user_name = models.CharField('客户姓名', max_length=15)
+class InfoModel(models.Model):
     address = models.CharField('联系地址', max_length=100, blank=True, null=True)
     phone_number = models.CharField('联系电话', max_length=20)
     add_date = models.DateField('添加日期', auto_now_add=True)
 
+    class Meta:
+        abstract = True
+
+
+class Customer(InfoModel):
+    """
+    购买商品的客户
+    """
+    user_name = models.CharField('客户姓名', max_length=15)
 
     def __str__(self):
         return self.user_name + ': ' + self.phone_number
@@ -39,31 +51,21 @@ class Category(models.Model):
         verbose_name_plural = '类别'
         ordering = ['add_date']
 
+
 def set_user_name_verbose_name(class_name, parents, attributes):
     user_name = attributes.get('user_name', None)
     if user_name:
         user_name.verbose_name = '供货商姓名'
     return type(class_name, parents, attributes)
 
-def modify_fields(**kwargs):
-    def wrap(cls):
-        for field, prop_dict in kwargs.items():
-            for prop, val in prop_dict.items():
-                setattr(cls._meta.get_field(field), prop, val)
-        return cls
-    return wrap
 
-@modify_fields(user_name={
-    'verbose_name': '供货商姓名'})
 class Shop(Customer):
     """
     进货商
     """
-    Customer.user_name.verbose_name = '供货商姓名'
+    # user_name = models.CharField('供货商姓名', max_length=15)
     shop_name = models.CharField('供货商名称', max_length=20)
     shop_address = models.CharField('供货商地址', max_length=100)
-
-
 
     def __str__(self):
         return self.shop_name
@@ -73,6 +75,21 @@ class Shop(Customer):
         verbose_name_plural = '供货商'
         ordering = ['shop_name']
 
+class Shops(InfoModel):
+    """
+    进货商
+    """
+    user_name = models.CharField('供货商姓名', max_length=15)
+    shop_name = models.CharField('供货商名称', max_length=20)
+    shop_address = models.CharField('供货商地址', max_length=100)
+
+    def __str__(self):
+        return self.shop_name
+
+    class Meta:
+        verbose_name = '供货商'
+        verbose_name_plural = '供货商'
+        ordering = ['shop_name']
 
 class Goods(models.Model):
     """
