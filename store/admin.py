@@ -23,6 +23,9 @@ class GoddsAdmin(admin.ModelAdmin):
     def save_model(self, request, obj, form, change):
         if getattr(obj, 'add_people', None) is None:
             obj.add_people = request.user
+
+        if not getattr(obj, 'category', None):
+            raise ValidationError('未填写商品种类')
         obj.save()
 
 
@@ -53,7 +56,7 @@ class ShopAdmin(admin.ModelAdmin):
         }),
     )
     list_display = ('user_name', 'shop_name', 'phone_number', 'shop_address', 'add_date',)
-    search_fields = ['shop_name']
+    search_fields = ['user_name', 'shop_name']
 
 
 # class GoodsShopAdmin(admin.ModelAdmin):
