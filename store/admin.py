@@ -199,7 +199,8 @@ from django.http.response import HttpResponse
 from django.views.decorators.csrf import csrf_exempt
 from django.shortcuts import render
 import json
-
+from django.http import HttpResponseRedirect
+from django.core.urlresolvers import reverse
 class OrderAdmin(OrderMixin, admin.ModelAdmin):
 
     def changelist_view(self, request, extra_context=None):
@@ -244,18 +245,25 @@ class OrderAdmin(OrderMixin, admin.ModelAdmin):
         all_price = 0.0
         cell_num = 0
         code = 1
-        for key, value in json.loads(request.POST['data_list']).items():
+        if request.POST.get('data_list', None) is None:
+            return HttpResponseRedirect(reverse('admin:index'))
+
+        data_all = json.loads(request.POST['data_list'])
+        prices = data_all['price']
+        for key, value in data_all['num'].items():
             g = Goods.objects.get(id=key)
             g.num = value
             g.code = code
+            price = float(prices[key])
+            g.last_price = price
             data.append(g)
-            all_price += value * g.last_price
+            all_price += value * price
             g.remain = g.remain - g.num
             g.save()
             GoodsSellRecord.objects.create(goods=g, sell_num=value,
                                            updater=request.user,
                                            average_price=g.average_price,
-                                           sell_price=g.last_price)
+                                           sell_price=price)
             cell_num += 1
             code += 1
 

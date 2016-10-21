@@ -36,7 +36,7 @@
                 {% for good in goods %}
                     <tr>
                         <td>{{ good.goods_name }}</td>
-                        <td>{{ good.last_price }}</td>
+                        <td><input value="{{ good.last_price }}" type="number"></td>
                         <td>{{ good.unit_name }}</td>
                         <td>{{ good.remain }}</td>
                         <td><input value="1" type="number"><a href="javascript:void(0);" class="addlink" name="{{ good.id }}">添加到清单</a></td>

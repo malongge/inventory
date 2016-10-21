@@ -3,6 +3,7 @@
     $(document).ready(function ($) {
 
         var report_ids = {};
+        var price_ids = {};
 
          // function deleteLink(thi) {
          //        console.log(thi);
@@ -41,7 +42,7 @@
                     data.forEach(function (obj) {
                         tbody += '<tr>';
                         tbody += '<td>' + obj.name + '</td>';
-                        tbody += '<td>' + obj.price + '</td>';
+                        tbody += '<td><input value="' + obj.price + '" type="number"></td>';
                         tbody += '<td>' + obj.unit + '</td>';
                         tbody += '<td>' + obj.remain + '</td>';
                         tbody += '<td><input value="1" type="number">' +
@@ -90,7 +91,12 @@
             var tds = item.parent().siblings();
             var data = [];
             tds.each(function () {
-                data.push($(this).text());
+                if($(this).text()){
+                data.push($(this).text());}
+                else{
+                    data.push($(this).children().val());
+                }
+                // console.log(data);
             });
             console.warn(num);
             if (num > parseInt(data[3]) || num == 0) {
@@ -101,18 +107,30 @@
                 var name = data[0];
                 report.push(name);
                 report.push(num);
-                var price = num * parseInt(data[1]);
+                var price = num * parseFloat(data[1]);
                 report.push(price);
 
+                var find_a = $('.report-list tbody tr').find("a[name='"+item.attr('name')+"']");
+                // 以输入的实际价格为标准计算
+                if (!!find_a.length){
+                    var temp = $(find_a[0]).parent().siblings();
+                    var n = $(temp[1]);
+                    var p = $(temp[2]);
+                    n.text(parseInt(n.text())+num);
+                    p.text(price*(report_ids[item.attr('name')]+num));
 
-                var append = '<tr>';
+                }else{
+                    var append = '<tr>';
                 report.forEach(function (val) {
                     append += '<td>' + val + '</td>';
                 });
                 append += '<td><a href="javascript:void(0);" class="deletelink" name="'+item.attr('name')+'"></a></td></tr>';
                 $('.report .report-list tbody').append(append);
+                }
+
                 $(tds[3]).html(parseInt(data[3]) - num);
                 count_ids(item.attr('name'), num);
+                price_ids[item.attr('name')] = parseFloat(data[1]);
 
             }
 
@@ -121,7 +139,7 @@
                 var count = 0;
                 $('.report-list tbody tr').each(
                     function () {
-                        count += parseInt($(this)[0].children[2].textContent);
+                        count += parseFloat($(this)[0].children[2].textContent);
                     });
                 return count;
             });
@@ -147,7 +165,16 @@
                 var temp_num =  parseInt($($(this).parent().siblings()[1]).text());
                 console.log(report_ids);
                 sub_ids(temp_name, temp_num);
-                $(this).parent().parent().remove()
+            delete price_ids[temp_name];
+                $(this).parent().parent().remove();
+            $('.report .count-money p').html(function () {
+                var count = 0;
+                $('.report-list tbody tr').each(
+                    function () {
+                        count += parseFloat($(this)[0].children[2].textContent);
+                    });
+                return count;
+            });
         });
 
 
@@ -171,8 +198,12 @@
 
         $('.print-link').click(function () {
             console.log(JSON.stringify(report_ids));
-            StandardPost(window.report_url, JSON.stringify(report_ids));
-            report_ids = {}
+            var data = {};
+            data['num'] = report_ids;
+            data['price']= price_ids;
+            StandardPost(window.report_url, JSON.stringify(data));
+            report_ids = {};
+            price_ids = {};
         })
     });
 })(django.jQuery);

@@ -288,7 +288,7 @@ class GoodsSellRecord(models.Model):
     class Meta:
         verbose_name = '销售记录'
         verbose_name_plural = '销售记录'
-        ordering = ['goods', 'sell_num']
+        ordering = ['-date', 'goods', 'sell_num']
 
     def __str__(self):
         return self.goods.goods_name
