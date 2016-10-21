@@ -166,6 +166,14 @@
                 console.log(report_ids);
                 sub_ids(temp_name, temp_num);
             delete price_ids[temp_name];
+            var find_a = $('.item-list tbody tr').find("a[name='"+temp_name+"']");
+                // 以输入的实际价格为标准计算
+                if (!!find_a.length){
+                    var temp = $(find_a[0]).parent().siblings();
+                    var n = $(temp[3]);
+                    n.text(parseInt(n.text())+temp_num);
+
+                }
                 $(this).parent().parent().remove();
             $('.report .count-money p').html(function () {
                 var count = 0;
@@ -198,12 +206,16 @@
 
         $('.print-link').click(function () {
             console.log(JSON.stringify(report_ids));
-            var data = {};
+            var r=confirm("你确定要打印清单吗，确定的话会生成销售记录，并扣减商品数量！！！");
+            if (r == true){
+                var data = {};
             data['num'] = report_ids;
             data['price']= price_ids;
             StandardPost(window.report_url, JSON.stringify(data));
             report_ids = {};
             price_ids = {};
+            }
+
         })
     });
 })(django.jQuery);
