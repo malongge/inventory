@@ -107,5 +107,18 @@
     display: none;
 }
 
+.red-tr {
+    background-color: crimson;
+    color: blue;
+}
+
+.red-tr a{
+    color: blue;
+}
+
+.red-tr a:hover{
+    color: #417690;
+}
+
 
 

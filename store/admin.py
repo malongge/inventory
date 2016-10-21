@@ -15,7 +15,7 @@ class GoddsAdmin(admin.ModelAdmin):
         }),
     )
     list_display = (
-    'goods_name', 'unit_name', 'average_price', 'last_price',  'remain', 'recent_sell', 'is_delete',
+    'goods_name', 'unit_name', 'average_price', 'last_price',  'remain', 'sell_amount', 'in_amount', 'own_amount',
     'last_time', 'add_people', 'update_date')
     list_filter = ['category']
     search_fields = ['goods_name']

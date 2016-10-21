@@ -40,7 +40,11 @@
                     console.log(data);
                     var tbody = '';
                     data.forEach(function (obj) {
-                        tbody += '<tr>';
+                        if(parseInt(obj.remain) < 5) {
+                            tbody += '<tr class="red-tr">';
+                        }else{
+                            tbody += '<tr>';
+                        }
                         tbody += '<td>' + obj.name + '</td>';
                         tbody += '<td><input value="' + obj.price + '" type="number"></td>';
                         tbody += '<td>' + obj.unit + '</td>';

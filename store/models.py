@@ -124,6 +124,21 @@ class Goods(models.Model):
             return int(self.num) * self.last_price
         return 0
 
+    def sell_amount(self):
+        return self.remain * self.last_price
+        # current_receipt_purchase_amounts = Purchase.objects.filter(receipt__id=request.id).values_list('price',flat=True)
+        # total_amount = sum(current_receipt_purchase_amounts)
+        # return total_amount
+    def in_amount(self):
+         return self.remain * self.average_price
+
+    def own_amount(self):
+        return self.sell_amount() - self.in_amount()
+
+    sell_amount.short_description = '销售总价'
+    in_amount.short_description = '进货总价'
+    own_amount.short_description = '利润'
+
 
 
 
