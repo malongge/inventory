@@ -59,23 +59,24 @@ def set_user_name_verbose_name(class_name, parents, attributes):
     return type(class_name, parents, attributes)
 
 
-class Shop(Customer):
-    """
-    进货商
-    """
-    # user_name = models.CharField('供货商姓名', max_length=15)
-    shop_name = models.CharField('供货商名称', max_length=20)
-    shop_address = models.CharField('供货商地址', max_length=100)
+# class Shop(InfoModel):
+#     """
+#     进货商
+#     """
+#     # user_name = models.CharField('供货商姓名', max_length=15)
+#     shop_name = models.CharField('供货商名称', max_length=20)
+#     shop_address = models.CharField('供货商地址', max_length=100)
+#
+#     def __str__(self):
+#         return self.shop_name
+#
+#     class Meta:
+#         verbose_name = '供货商'
+#         verbose_name_plural = '供货商'
+#         ordering = ['shop_name']
 
-    def __str__(self):
-        return self.shop_name
 
-    class Meta:
-        verbose_name = '供货商'
-        verbose_name_plural = '供货商'
-        ordering = ['shop_name']
-
-class Shops(InfoModel):
+class Shop(InfoModel):
     """
     进货商
     """
@@ -90,6 +91,7 @@ class Shops(InfoModel):
         verbose_name = '供货商'
         verbose_name_plural = '供货商'
         ordering = ['shop_name']
+
 
 class Goods(models.Model):
     """
