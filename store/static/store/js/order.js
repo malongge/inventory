@@ -1,5 +1,12 @@
+
 (function ($) {
     $(document).ready(function ($) {
+
+        var report_ids = {};
+
+         // function deleteLink(thi) {
+         //        console.log(thi);
+         //    }
 
         $('#sidebar ul li:first').addClass('select');
 
@@ -10,6 +17,9 @@
         function hideLoading() {
 
         }
+
+
+
 
         $("#sidebar li").click(function () {
 
@@ -51,7 +61,7 @@
 
         });
 
-        var report_ids = {};
+
 
         function count_ids(name, num) {
             if(name in report_ids) {
@@ -59,6 +69,16 @@
             }
             else{
                 report_ids[name] = num;
+            }
+        }
+
+        function sub_ids(name, num) {
+
+            if (report_ids[name] > num) {
+                report_ids[name] = report_ids[name] - num;
+            }
+            else{
+                delete report_ids[name];
             }
         }
 
@@ -89,13 +109,12 @@
                 report.forEach(function (val) {
                     append += '<td>' + val + '</td>';
                 });
-                append += '<td><a href="javascript:void(0);" class="deletelink"></a></td></tr>';
+                append += '<td><a href="javascript:void(0);" class="deletelink" name="'+item.attr('name')+'"></a></td></tr>';
                 $('.report .report-list tbody').append(append);
                 $(tds[3]).html(parseInt(data[3]) - num);
                 count_ids(item.attr('name'), num);
+
             }
-
-
 
             /* 直接显示总计价格计算 */
             $('.report .count-money p').html(function () {
@@ -111,9 +130,26 @@
                 $('.report').removeClass('nodisplay');
             }
 
-        })}
+        });
+            // $('.deletelink').click(function () {
+            //     var temp_name = $(this).attr('name');
+            //     var temp_num =  parseInt($($(this).parent().siblings()[1]).text());
+            //     console.log(report_ids);
+            //     sub_ids(temp_name, temp_num);
+            //     $(this).parent().parent().remove()
+            // });
+        }
 
         addLinkEvent();
+
+        $(".report-list").delegate(".deletelink","click",function(){
+            var temp_name = $(this).attr('name');
+                var temp_num =  parseInt($($(this).parent().siblings()[1]).text());
+                console.log(report_ids);
+                sub_ids(temp_name, temp_num);
+                $(this).parent().parent().remove()
+        });
+
 
         function StandardPost (url,args)
         {

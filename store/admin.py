@@ -24,8 +24,8 @@ class GoddsAdmin(admin.ModelAdmin):
         if getattr(obj, 'add_people', None) is None:
             obj.add_people = request.user
 
-        if not getattr(obj, 'category', None):
-            raise ValidationError('未填写商品种类')
+        # if not getattr(obj, 'category', None):
+        #     raise ValidationError('未填写商品种类')
         obj.save()
 
 
