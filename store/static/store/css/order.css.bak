@@ -1,0 +1,124 @@
+.item-list tbody {
+    background: #f8f8f8;
+}
+
+.item-list thead {
+    background-color: #417690;
+    color: #f8f8f8;
+}
+
+.item-list tbody td {
+    border-width: 3px ;
+    border-style: solid;
+    border-color: white;
+    vertical-align: middle;
+
+}
+
+.item-list tbody input{
+    max-width: 50px;
+    margin-right: 5px;
+}
+
+
+.flex-display {
+    display: flex;
+    flex-wrap: wrap;
+}
+
+.top-border {
+    border-color: transparent;
+    border-top-color: #79aec8;
+    border-top-width: 2px;
+    border-style: solid;
+}
+
+#sidebar {
+    display: flex;
+    flex-wrap: wrap;
+    padding: 0 10px;
+}
+
+#sidebar .report {
+    min-width: 200px;
+    background-color: aqua;
+}
+
+.padding-right {
+    padding-right: 50px;
+}
+
+.margin-right {
+    margin-right: 50px;
+}
+
+#sidebar ul {
+    list-style-type:none;
+}
+
+.border-bottom {
+    border-color: transparent;
+    border-style: solid;
+    border-bottom-color: bisque;
+    border-width:1px;
+}
+
+#sidebar ul li {
+    list-style-type: none;
+    margin: 3px 0;
+    padding: 2px;
+    color: seagreen;
+}
+
+#sidebar ul .select {
+    background-color: bisque;
+}
+
+#sidebar ul li:hover {
+    color: brown;
+    cursor: pointer;
+}
+
+#sidebar li em {
+    display: none;
+}
+
+.report thead {
+    background-color: #79AEC8;
+}
+
+.report .count-money {
+    margin-top: 5px;
+    float: right;
+}
+
+.report .print-link {
+    float: left;
+    vertical-align: middle;
+    margin-top: 5px;
+}
+
+.count-money p {
+    display: inline;
+    margin-left: 5px;
+}
+
+.nodisplay{
+    display: none;
+}
+
+.red-tr {
+    background-color: crimson;
+    color: blue;
+}
+
+.red-tr a{
+    color: blue;
+}
+
+.red-tr a:hover{
+    color: #417690;
+}
+
+
+

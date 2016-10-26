@@ -201,6 +201,7 @@ from django.shortcuts import render
 import json
 from django.http import HttpResponseRedirect
 from django.core.urlresolvers import reverse
+from django.db.models import Q
 class OrderAdmin(OrderMixin, admin.ModelAdmin):
 
     def changelist_view(self, request, extra_context=None):
@@ -215,8 +216,7 @@ class OrderAdmin(OrderMixin, admin.ModelAdmin):
     def change_view(self, request, object_id, form_url='', extra_context=None):
         return super(OrderAdmin, self).changeform_view(request, object_id, form_url, extra_context)
 
-    def goods_list_view(self, request, cat_id):
-        goods = Goods.objects.filter(category=cat_id)
+    def _goods_to_json(self, goods):
         ret = []
         for g in goods:
             data = {}
@@ -226,6 +226,28 @@ class OrderAdmin(OrderMixin, admin.ModelAdmin):
             data['unit'] = g.unit_name
             data['id'] = g.id
             ret.append(data)
+        return ret
+
+    def search_goods_view(self, request):
+        search = request.POST.get('search_text', None)
+        if not search:
+            return HttpResponse(json.dumps([]), content_type="application/json")
+        # goods = Goods.objects.filter(Q(goods_name__icontains=search) | Q(shop__shop_name__icontains=search))
+        goods = Goods.objects.filter(Q(goods_name__icontains=search))
+        return HttpResponse(json.dumps(self._goods_to_json(goods)), content_type="application/json")
+
+    def goods_list_view(self, request, cat_id):
+        goods = Goods.objects.filter(category=cat_id)
+        ret = self._goods_to_json(goods)
+        # ret = []
+        # for g in goods:
+        #     data = {}
+        #     data['name'] = g.goods_name
+        #     data['price'] = g.last_price
+        #     data['remain'] = g.remain
+        #     data['unit'] = g.unit_name
+        #     data['id'] = g.id
+        #     ret.append(data)
         return HttpResponse(json.dumps(ret), content_type="application/json")
 
     def get_urls(self):
@@ -234,34 +256,58 @@ class OrderAdmin(OrderMixin, admin.ModelAdmin):
             url(r'^goods-list/(\d+)/$',
                 self.admin_site.admin_view(self.goods_list_view),
                 name='%s_%s_goods-list' % self.get_model_info()),
+            url(r'^goods-search-list/$',
+                self.admin_site.admin_view(self.search_goods_view),
+                name='%s_%s_goods-search-list' % self.get_model_info()),
             url(r'^report/$',
                 self.admin_site.admin_view(self.report_view),
                 name='%s_%s_report' % self.get_model_info()),
+            # url(r'^obj/$',
+            #     self.admin_site.admin_view(self.obj_js),
+            #     name='%s_%s_obj' % self.get_model_info()),
         ]
         return my_urls + urls
 
+
+    @transaction.atomic
     def report_view(self, request):
         data = []
         all_price = 0.0
-        cell_num = 0
-        code = 1
+        cell_num = 0  # 增加一些空的行
+        code = 1  # 增加一行序号列
         if request.POST.get('data_list', None) is None:
             return HttpResponseRedirect(reverse('admin:index'))
-
         data_all = json.loads(request.POST['data_list'])
-        prices = data_all['price']
-        for key, value in data_all['num'].items():
+        # prices = data_all['price']
+        # for key, value in data_all['num'].items():
+        #     g = Goods.objects.get(id=key)
+        #     g.num = value
+        #     g.code = code
+        #     price = float(prices[key])
+        #     g.last_price = price
+        #     data.append(g)
+        #     all_price += value * price
+        #     g.remain = g.remain - g.num
+        #     g.save()
+        #     GoodsSellRecord.objects.create(goods=g, sell_num=value,
+        #                                    updater=request.user,
+        #                                    average_price=g.average_price,
+        #                                    sell_price=price)
+        #     cell_num += 1
+        #     code += 1
+        for key, value in data_all.items():
             g = Goods.objects.get(id=key)
-            g.num = value
+            g.num = value['num']
             g.code = code
-            price = float(prices[key])
-            g.last_price = price
-            data.append(g)
-            all_price += value * price
+            price = float(value['price'])
+
+            all_price += g.num * price
             g.remain = g.remain - g.num
             g.save()
-            GoodsSellRecord.objects.create(goods=g, sell_num=value,
-                                           updater=request.user,
+            # 价格改变只是零时性的
+            g.last_price = price
+            data.append(g)
+            GoodsSellRecord.objects.create(goods=g, sell_num=g.num, updater=request.user,
                                            average_price=g.average_price,
                                            sell_price=price)
             cell_num += 1
@@ -273,6 +319,13 @@ class OrderAdmin(OrderMixin, admin.ModelAdmin):
 
         return render(request, context={'data': data, 'report': default_report, 'price': all_price,
                                         'cell_num': range(max(15-cell_num, 0))}, template_name=self.report_template)
+
+    # def obj_js(self, request):
+    #     self.change_list_template = 'admin/liuzhiping/change_list_obj.html'
+    #     categories = Category.objects.all()
+    #     goods = Goods.objects.filter(category=categories[0])
+    #     extra_context = {'categories': categories, 'goods': goods}
+    #     return super(OrderAdmin, self).changelist_view(request, extra_context)
 
 class ReportAdmin(admin.ModelAdmin):
     list_display = ('title', 'alias', 'ad', 'phone', 'address', 'remark', 'date',

@@ -1,6 +1,5 @@
 {% extends "admin/change_list.html" %}
-{#{% load i18n admin_urls static admin_list %}#}
-{% load i18n admin_static%}
+{% load i18n admin_static %}
 {# Original template renders object-tools only when has_add_permission is True. #}
 {# This hack allows sub templates to add to object-tools #}
 {% block extrastyle %}
@@ -9,43 +8,20 @@
 {% endblock %}
 {% block extrahead %}
     {{ block.super }}
-    <script type="text/javascript" src="{% static 'store/js/order.js' %}"></script>
-    <script type="text/javascript" src="{% static 'store/js/item_list.js' %}"></script>
-    <script type="text/javascript">
-        window.CSRF_TOKEN = "{{ csrf_token }}";
-        window.report_url = "{% url 'admin:store_order_report' %}";
-    (function ($) {
-    $(document).ready(function () {
-        OrderReport.init({
-                //
-        });
-    });
-    })(django.jQuery);
-    </script>
+    <script type="text/javascript" src="{% static 'store/js/order.js.bak' %}"></script>
+    <script type="text/javascript"> window.CSRF_TOKEN = "{{ csrf_token }}";
+    window.report_url = "{% url 'admin:store_order_report' %}" </script>
 {% endblock %}
 
 {% block content_title %}<h1>选择物品添加到清单</h1>{% endblock %}
 {% block content %}
-    <div id="obj-error-note">
-    <p class="errornote">
-    请更正下列错误。
-    </p></div>
-{#    {% block search %}{% search_form cl %}{% endblock %}#}
-    <div id="toolbar"><div id="changelist-search">
-<div>
-<label for="searchbar"><img src="/static/admin/img/search.svg" alt="Search"></label>
-<input type="text" size="40" name="q" id="searchbar" autofocus="">
-<input id="obj-search" value="搜索" type="submit" name="{% url 'admin:store_order_goods-search-list' %}">
-</div>
-</div>
-    </div>
-    <div class="obj-flex-display">
-        <div id="obj-sidebar" class="obj-top-border obj-margin-right">
+    <div class="flex-display">
+        <div id="sidebar" class="top-border margin-right">
             <ul>{% for cate in categories %}
-                <li class="obj-border-bottom"
+                <li class="border-bottom"
                     value="{% url 'admin:store_order_goods-list' cate.id %}">{{ cate.name }}</li>{% endfor %}</ul>
         </div>
-        <div class="obj-margin-right" id="obj-item-list">
+        <div class="item-list margin-right">
       <table>
                 <thead>
                 <tr>
@@ -69,9 +45,9 @@
                 </tbody>
             </table>
         </div>
-        <div class="obj-no-display" id="obj-report-item"><h2>清单列表</h2>
+        <div class="report nodisplay"><h2>清单列表</h2>
             <hr>
-            <div id="obj-report-list">
+            <div class="report-list">
                 <table>
                     <thead>
                     <tr>
@@ -83,7 +59,7 @@
                     </thead>
                     <tbody></tbody>
                 </table>
-                <div id="obj-print-link"><a href="javascript:void(0);" name="{% url 'admin:store_order_report' %}">打印清单</a></div><div id="obj-count-money">总计:<p></p></div>
+                <div class="print-link"><a href="javascript:void(0);">打印清单</a></div><div class="count-money">总计:<p></p></div>
             </div>
         </div>
     </div>
