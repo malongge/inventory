@@ -33,7 +33,7 @@
                     var store = $(this).children()[3];
                     var num = parseInt($(store).text());
                     if(num < 5){
-                        $(this).addClass('obj-red-tr');
+                        $(store).addClass('obj-red-tr');
                     }
                 }
 
