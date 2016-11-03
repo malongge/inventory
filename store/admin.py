@@ -28,6 +28,12 @@ class GoddsAdmin(admin.ModelAdmin):
         #     raise ValidationError('未填写商品种类')
         obj.save()
 
+    class Media:
+        css = {
+            'all': ('store/css/my_admin.css',)
+        }
+        js = ('store/js/my_admin.js',)
+
 
 class CustomsAdmin(admin.ModelAdmin):
     fieldsets = (

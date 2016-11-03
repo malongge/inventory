@@ -98,8 +98,8 @@ class Goods(models.Model):
     商品
     """
     goods_name = models.CharField('商品名称', max_length=15, unique=True)
-    average_price = models.FloatField('进价')
-    last_price = models.FloatField('售价')
+    average_price = models.FloatField('进价', default=0)
+    last_price = models.FloatField('售价', default=0)
     unit_name = models.CharField('单位', max_length=10)
     add_people = models.ForeignKey(User, editable=False, verbose_name='添加人')
     update_date = models.DateField('更新日期', auto_now_add=True)

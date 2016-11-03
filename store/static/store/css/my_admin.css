@@ -1,0 +1,7 @@
+.remain-low {
+    background-color: crimson;
+}
+
+.average-price-warn, .last-price-warn {
+    color: coral;
+}
