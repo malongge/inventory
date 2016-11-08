@@ -4,6 +4,7 @@ from django.db import transaction
 from django.core.exceptions import PermissionDenied
 from django.core.exceptions import ValidationError
 
+Max_Row = 13
 class GoddsAdmin(admin.ModelAdmin):
     fieldsets = (
         (None, {
@@ -324,7 +325,7 @@ class OrderAdmin(OrderMixin, admin.ModelAdmin):
 
 
         return render(request, context={'data': data, 'report': default_report, 'price': all_price,
-                                        'cell_num': range(max(15-cell_num, 0))}, template_name=self.report_template)
+                                        'cell_num': range(max(Max_Row-cell_num, 0))}, template_name=self.report_template)
 
     # def obj_js(self, request):
     #     self.change_list_template = 'admin/liuzhiping/change_list_obj.html'
