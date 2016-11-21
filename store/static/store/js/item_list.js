@@ -73,14 +73,28 @@
                 that.dom.shade.css('display', 'none');
             });
             this.dom.printLink.click(function () {
-            // console.log(JSON.stringify(report_ids));
-            var r=confirm("你确定要打印清单吗，确定的话会生成销售记录，并扣减商品数量！！！");
-            if (r == true){
                 var data = {};
                 data['user'] = that.dom.userNameLabel.text();
+                if (!data['user']){
+                    alert('请选择一个客户，然后再打印')
+                    return
+                }
+
                 data['arrears'] = that.dom.arrearsPrice.val();
-                data['list_data'] = that.cache_items;
-                that.StandardPost($(this).attr('name'), JSON.stringify(data));
+                try{
+                if (data['arrears']){
+                    parseFloat(data['arrears'])
+                }
+            }
+            catch(Exception){
+                return
+            }
+            // console.log(JSON.stringify(report_ids));
+                var r=confirm("你确定要打印清单吗，确定的话会生成销售记录，并扣减商品数量！！！");
+                if (r == true){
+
+                    data['list_data'] = that.cache_items;
+                    that.StandardPost($(this).attr('name'), JSON.stringify(data));
             }
 
 
@@ -125,6 +139,7 @@
                 alert('请输入查询内容');
                 return
             }
+
             var that = this;
             $.ajax({
                 type: "post",

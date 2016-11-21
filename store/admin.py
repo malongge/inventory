@@ -324,8 +324,8 @@ class OrderAdmin(OrderMixin, admin.ModelAdmin):
         #                                    sell_price=price)
         #     cell_num += 1
         #     code += 1
-        import pdb
-        pdb.set_trace()
+        # import pdb
+        # pdb.set_trace()
 
         arr = data_all['arrears']
         name = data_all['user']

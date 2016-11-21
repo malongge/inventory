@@ -31,6 +31,13 @@
     请更正下列错误。
     </p></div>
 {#    {% block search %}{% search_form cl %}{% endblock %}#}
+{#    <div class="messagepop pop">#}
+{#  <form method="post" id="new_message" action="/messages">#}
+{#    <p><label for="email">Your email or name</label><input type="text" size="30" name="email" id="email" /></p>#}
+{#    <p><label for="body">Message</label><textarea rows="6" name="body" id="body" cols="35"></textarea></p>#}
+{#    <p><input type="submit" value="Send Message" name="commit" id="message_submit"/> or <a class="close" href="/">Cancel</a></p>#}
+{#  </form>#}
+</div>
     <div id="toolbar"><div id="changelist-search">
 <div>
 <label for="searchbar"><img src="/static/admin/img/search.svg" alt="Search"></label>
@@ -83,8 +90,22 @@
                     </thead>
                     <tbody></tbody>
                 </table>
+                <div style="padding: 5px;"><a href="javascript:void(0);" id="choose_user">选择用户</a><label id="user_name"></label></div>
+{##}
+                <div><input placeholder="有赊账填写此项" id="arrears_price" type="number"></div>
                 <div id="obj-print-link"><a href="javascript:void(0);" name="{% url 'admin:store_order_report' %}">打印清单</a></div><div id="obj-count-money">总计:<p></p></div>
             </div>
         </div>
+        <div class="obj-no-display" id="shade-block">
+            <div class="pop-panel">
+                <div style="display: flex;">
+                <input type="text" size="40" name="q" id="search-user-bar" autofocus="" style="width: 200px; margin-right: 20px;">
+                <input id="user-search" value="搜索" type="submit" name="{% url 'admin:store_order_custom-search-list' %}">
+                </div>
+                <div class="table-body"></div>
+                <a href="javascript:void(0);" id="exit-panel" style="float: right; margin-top: 60px;">退出面板</a>
+            </div>
+        </div>
+
     </div>
 {% endblock %}
