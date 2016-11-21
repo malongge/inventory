@@ -43,15 +43,17 @@
         append_list: function (data) {
              var tbody = '';
                     data.forEach(function (obj) {
-                        if(parseInt(obj.remain) < 5) {
-                            tbody += '<tr class="obj-red-tr">';
-                        }else{
-                            tbody += '<tr>';
-                        }
+
+                        tbody += '<tr>';
                         tbody += '<td>' + obj.name + '</td>';
                         tbody += '<td><input value="' + obj.price + '" type="number"></td>';
                         tbody += '<td>' + obj.unit + '</td>';
-                        tbody += '<td>' + obj.remain + '</td>';
+                        if(parseInt(obj.remain) < 5) {
+                            tbody += '<td class="obj-red-tr">'
+                        }else{
+                            tbody += '<td>';
+                        }
+                        tbody += obj.remain + '</td>';
                         tbody += '<td><input value="1" type="number">' +
                             '<a href="javascript:void(0);" class="addlink" name="'+obj.id+'">添加到清单</a></td></tr>';
 
@@ -102,4 +104,6 @@
     };
 
 	this.OrderReport = OrderReport;
+
+
 })(django.jQuery);

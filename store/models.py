@@ -81,7 +81,7 @@ class Shop(InfoModel):
     进货商
     """
     user_name = models.CharField('供货商姓名', max_length=15)
-    shop_name = models.CharField('供货商名称', max_length=20)
+    shop_name = models.CharField('供货商名称', max_length=20, unique=True)
     shop_address = models.CharField('供货商地址', max_length=100)
 
     def __str__(self):

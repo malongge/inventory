@@ -25,6 +25,7 @@
     display: flex;
     flex-wrap: wrap;
     margin-top: 20px;
+
 }
 
 .obj-top-border {
@@ -84,6 +85,11 @@
     display: none;
 }
 
+#obj-item-list {
+    max-width: 400px;
+    overflow: auto;
+    max-height: 600px;
+}
 #obj-report-list thead {
     background-color: #79AEC8;
 }
@@ -162,5 +168,43 @@
     background-color: white;
 }
 
+#obj-report-item {
+    max-width: 250px;
+}
+
+
+/*........................*/
+
+a.selected {
+  background-color:#1F75CC;
+  color:white;
+  z-index:100;
+}
+
+.messagepop {
+  background-color:#FFFFFF;
+  border:1px solid #999999;
+  cursor:default;
+  display:none;
+  margin-top: 15px;
+  position:absolute;
+  text-align:left;
+  width:394px;
+  z-index:50;
+  padding: 25px 25px 20px;
+}
+
+label {
+  display: block;
+  margin-bottom: 3px;
+  padding-left: 15px;
+  text-indent: -15px;
+}
+
+.messagepop p, .messagepop.div {
+  border-bottom: 1px solid #EFEFEF;
+  margin: 8px 0;
+  padding-bottom: 8px;
+}
 
 

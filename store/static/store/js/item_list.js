@@ -1,6 +1,10 @@
 (function($){
     var OrderReport = this.OrderReport || {}, that = OrderReport;
 
+    $.fn.slideFadeToggle = function(easing, callback) {
+        return this.animate({ opacity: 'toggle', height: 'toggle' }, 'fast', easing, callback);
+    };
+
     OrderReport.ItemList = {
         StandardPost: function (url,args)
         {
@@ -28,7 +32,11 @@
                 countMoney: $('#obj-count-money p'),
                 printLink: $('#obj-print-link a'),
                 searchButton: $('#obj-search'),
-                searchText: $('#searchbar')
+                searchText: $('#searchbar'),
+                chooseUser: $('#choose_user'),
+                userNameLabel: $('#user_name'),
+                arrearsPrice: $('#arrears_price'),
+                popPanel: $('.pop')
             };
 
             this.hideReportList();
@@ -58,6 +66,15 @@
             if (r == true){
                 that.StandardPost($(this).attr('name'), JSON.stringify(that.cache_items));
             }
+
+            this.dom.chooseUser.click(function () {
+                var here = this;
+                that.dom.chooseUser.slideFadeToggle(
+                    function () {
+                        here.addClass('obj-no-display');
+                    }
+                )
+            })
         });
 
             this.dom.searchButton.click(function () {
@@ -215,7 +232,6 @@
             this.init_dom();
             this.init_handler();
         }
-
     };
 
 	this.OrderReport = OrderReport;
