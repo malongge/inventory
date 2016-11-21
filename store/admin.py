@@ -164,6 +164,10 @@ class TransferGoodsAdmin(admin.ModelAdmin):
         obj.save()
 
 
+class ArrearsAdmin(admin.ModelAdmin):
+    list_display = ('arrears_price', 'customer', 'is_arrears', 'date')
+
+
 class GoodsSellRecordAdmin(admin.ModelAdmin):
     fieldsets = (
         (None, {
@@ -171,11 +175,11 @@ class GoodsSellRecordAdmin(admin.ModelAdmin):
         }),
         ('选填项', {
             'classes': ('collapse',),
-            'fields': ('is_arrears', 'arrears_price')
+            'fields': ('arrears',)
         }),
     )
-    list_display = ('goods', 'sell_num', 'average_price', 'sell_price', 'customer', 'is_arrears',
-                    'arrears_price', 'remark', 'updater', 'date')
+    list_display = ('goods', 'sell_num', 'average_price', 'sell_price', 'customer',
+                    'arrears', 'remark', 'updater', 'date')
     search_fields = ['goods']
 
     @transaction.atomic
@@ -209,6 +213,7 @@ import json
 from django.http import HttpResponseRedirect
 from django.core.urlresolvers import reverse
 from django.db.models import Q
+
 class OrderAdmin(OrderMixin, admin.ModelAdmin):
 
     def changelist_view(self, request, extra_context=None):
@@ -243,6 +248,20 @@ class OrderAdmin(OrderMixin, admin.ModelAdmin):
         goods = Goods.objects.filter(Q(goods_name__icontains=search))
         return HttpResponse(json.dumps(self._goods_to_json(goods)), content_type="application/json")
 
+    def search_customer_view(self, request):
+        search = request.POST.get('search_text', None)
+        if not search:
+            return HttpResponse(json.dumps([]), content_type="application/json")
+        users = Customer.objects.filter(Q(user_name__icontains=search))
+        user_list = []
+        for u in users:
+            user_dict = {}
+            user_dict['name'] = u.user_name
+            user_dict['phone'] = u.phone_number
+            user_dict['id'] = u.id
+            user_list.append(user_dict)
+        return HttpResponse(json.dumps(user_list), content_type="application/json")
+
     def goods_list_view(self, request, cat_id):
         goods = Goods.objects.filter(category=cat_id)
         ret = self._goods_to_json(goods)
@@ -266,6 +285,9 @@ class OrderAdmin(OrderMixin, admin.ModelAdmin):
             url(r'^goods-search-list/$',
                 self.admin_site.admin_view(self.search_goods_view),
                 name='%s_%s_goods-search-list' % self.get_model_info()),
+            url(r'^custom-search-list/$',
+                self.admin_site.admin_view(self.search_customer_view),
+                name='%s_%s_custom-search-list' % self.get_model_info()),
             url(r'^report/$',
                 self.admin_site.admin_view(self.report_view),
                 name='%s_%s_report' % self.get_model_info()),
@@ -302,12 +324,25 @@ class OrderAdmin(OrderMixin, admin.ModelAdmin):
         #                                    sell_price=price)
         #     cell_num += 1
         #     code += 1
-        for key, value in data_all.items():
+        import pdb
+        pdb.set_trace()
+
+        arr = data_all['arrears']
+        name = data_all['user']
+        print(arr, name)
+
+        cust = Customer.objects.get(user_name=name)
+        if arr.strip():
+            arr = float(arr)
+            ap = ArrearsPrice.objects.create(arrears_price=arr, customer=cust)
+        else:
+            ap = None
+
+        for key, value in data_all['list_data'].items():
             g = Goods.objects.get(id=key)
             g.num = value['num']
             g.code = code
             price = float(value['price'])
-
             all_price += g.num * price
             g.remain = g.remain - g.num
             g.save()
@@ -316,7 +351,7 @@ class OrderAdmin(OrderMixin, admin.ModelAdmin):
             data.append(g)
             GoodsSellRecord.objects.create(goods=g, sell_num=g.num, updater=request.user,
                                            average_price=g.average_price,
-                                           sell_price=price)
+                                           sell_price=price,customer=cust,arrears=ap)
             cell_num += 1
             code += 1
 
@@ -350,3 +385,4 @@ admin.site.register(ReturnRecord, ReturnRecordAdmin)
 admin.site.register(GoodsSellRecord, GoodsSellRecordAdmin)
 admin.site.register(Order, OrderAdmin)
 admin.site.register(Report, ReportAdmin)
+admin.site.register(ArrearsPrice, ArrearsAdmin)

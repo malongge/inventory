@@ -267,6 +267,21 @@ class Order(models.Model):
         ordering = ['-date']
 
 
+class ArrearsPrice(models.Model):
+    arrears_price = models.FloatField('欠款额')
+    customer = models.ForeignKey(Customer, verbose_name='客户姓名')
+    is_arrears = models.BooleanField('清除欠款', default=False)  # 是否欠款
+    date = models.DateTimeField('日期', auto_now_add=True)
+
+    def __str__(self):
+        return str(self.arrears_price)
+
+    class Meta:
+        verbose_name = '欠款记录'
+        verbose_name_plural = '欠款记录'
+        ordering = ['-date']
+
+
 class GoodsSellRecord(models.Model):
     """
     卖出商品记录
@@ -275,12 +290,12 @@ class GoodsSellRecord(models.Model):
     sell_num = models.IntegerField('销售数目')
     average_price = models.FloatField('进价', null=True, blank=True)
     sell_price = models.FloatField('售价', null=True, blank=True)
-    is_arrears = models.BooleanField('是否欠款', default=False)  # 是否欠款
     customer = models.ForeignKey(Customer, verbose_name='客户姓名', related_name='customer', null=True, blank=True)
     remark = models.TextField('描述信息', blank=True, null=True)
     updater = models.ForeignKey(User, verbose_name='操作人员', related_name='admin')
     date = models.DateTimeField('日期', auto_now_add=True)
-    arrears_price = models.FloatField('欠款额', null=True, blank=True)
+    arrears = models.ForeignKey(ArrearsPrice, verbose_name='欠款额', related_name='arrears', null=True, blank=True)
+
 
     @property
     def profit(self):

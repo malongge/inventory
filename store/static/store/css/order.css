@@ -181,17 +181,38 @@ a.selected {
   z-index:100;
 }
 
-.messagepop {
-  background-color:#FFFFFF;
+.shade-block {
+    background:gray;
+
+    position:absolute;
+
+    left:0px;
+
+    top:0px;
+
+    display:none;
+
+    z-index:20;
+
+    filter:alpha(opacity=60);
+
+    opacity: 0.95 !important;
+
+}
+
+.pop-panel {
+  background-color:bisque;
   border:1px solid #999999;
   cursor:default;
-  display:none;
-  margin-top: 15px;
-  position:absolute;
+  margin: auto;
+    margin-top: 100px;
+  position:relative;
   text-align:left;
-  width:394px;
+  width:300px;
+    height: 200px;
   z-index:50;
   padding: 25px 25px 20px;
+    overflow: auto;
 }
 
 label {
@@ -201,7 +222,7 @@ label {
   text-indent: -15px;
 }
 
-.messagepop p, .messagepop.div {
+.pop-panel  p, .pop-panel.div {
   border-bottom: 1px solid #EFEFEF;
   margin: 8px 0;
   padding-bottom: 8px;

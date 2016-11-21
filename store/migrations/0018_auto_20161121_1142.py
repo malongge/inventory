@@ -6,7 +6,9 @@ from django.db import migrations, models
 
 
 class Migration(migrations.Migration):
-
+    dependencies = [
+        ('store', '0017_auto_20161103_1033'),
+    ]
     operations = [
         migrations.AlterField(
             model_name='shop',
