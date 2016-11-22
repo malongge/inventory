@@ -167,7 +167,8 @@ class TransferGoodsAdmin(admin.ModelAdmin):
 class ArrearsAdmin(admin.ModelAdmin):
     list_display = ('arrears_price', 'customer', 'is_arrears', 'date')
 
-
+from django.utils.html import format_html
+from django.core.urlresolvers import reverse
 class GoodsSellRecordAdmin(admin.ModelAdmin):
     fieldsets = (
         (None, {
@@ -188,6 +189,8 @@ class GoodsSellRecordAdmin(admin.ModelAdmin):
             obj.updater = request.user
 
         obj.save()
+
+
 
 
 class OrderMixin(object):
@@ -351,15 +354,18 @@ class OrderAdmin(OrderMixin, admin.ModelAdmin):
             data.append(g)
             GoodsSellRecord.objects.create(goods=g, sell_num=g.num, updater=request.user,
                                            average_price=g.average_price,
-                                           sell_price=price,customer=cust,arrears=ap)
+                                           sell_price=price, customer=cust, arrears=ap)
             cell_num += 1
             code += 1
 
 
         default_report = Report.objects.filter(tag=True).order_by('-date')[0]
 
-
-        return render(request, context={'data': data, 'report': default_report, 'price': all_price,
+        if ap:
+            arr_p = ap.arrears_price
+        else:
+            arr_p = 0
+        return render(request, context={'data': data, 'report': default_report, 'price': all_price, 'customer': cust, 'arrears': arr_p,
                                         'cell_num': range(max(Max_Row-cell_num, 0))}, template_name=self.report_template)
 
     # def obj_js(self, request):

@@ -152,8 +152,8 @@ window.print();
     <div class="ad-title width">{{ report.ad }}</div>
     <div class="title width">
         <ul>
-            <li><label>客户：</label><input type="input"></li>
-            <li><label>电话：</label><input type="input"></li>
+            <li><label>客户：</label><input type="input" value="{{ customer.user_name }}"></li>
+            <li><label>电话：</label><input type="input" value="{{ customer.phone_number }}"></li>
             <li class="time">{% my_time %}</li>
         </ul>
     </div>
@@ -190,7 +190,7 @@ window.print();
                 <td></td>
             </tr>
         {% endfor %}
-        <tr><td colspan="4" style="text-align: left">付款方式:</td><td colspan="2">合计:<p id="count-all">{{ price }}</p>￥</td></tr>
+        <tr><td colspan="2" style="text-align: left">付款方式:</td><td colspan="2" style="text-align: left">欠款: {{ arrears }}</td><td colspan="2">合计:<p id="count-all">{{ price }}</p>￥</td></tr>
         </tbody>
     </table>
     </div>
