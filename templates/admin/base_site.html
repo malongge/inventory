@@ -1,7 +1,16 @@
 {% extends "admin/base.html" %}
-{% load i18n %}
+{% load i18n static %}
 {% block title %}进销管理系统{% endblock %}
-
+{% block extrahead %}
+    {% load selectable_tags %}
+    <link rel="stylesheet" href="{% static 'store/css/jquery-ui.css' %}" type="text/css">
+    <link href="{% static 'selectable/css/dj.selectable.css' %}" type="text/css" media="all" rel="stylesheet">
+    <script src="{% static 'store/js/jquery.min.js' %}"></script>
+    <script src="{% static 'store/js/jquery-ui.js' %}"></script>
+    <script type="text/javascript" src="{% static 'selectable/js/jquery.dj.selectable.js' %}"></script>
+    {% include_ui_theme 'smoothness' %}
+    {% include_jquery_libs  %}
+{% endblock %}
 {% block branding %}
 <h1 id="site-name"><a href="{% url 'admin:index' %}">进销管理系统平台</a></h1>
 {% endblock %}

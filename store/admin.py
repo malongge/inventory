@@ -3,9 +3,10 @@ from .models import *
 from django.db import transaction
 from django.core.exceptions import PermissionDenied
 from django.core.exceptions import ValidationError
-
+from store.forms import GoodsAdminForm
 Max_Row = 13
 class GoddsAdmin(admin.ModelAdmin):
+    form = GoodsAdminForm
     fieldsets = (
         (None, {
             'fields': ('goods_name', 'average_price', 'last_price', 'unit_name', 'last_time', 'remain', 'category')
@@ -79,9 +80,10 @@ class ShopAdmin(admin.ModelAdmin):
 #         if getattr(obj, 'last_updater', None) is None:
 #             obj.last_updater = request.user
 #         obj.save()
-
+from store.forms import AddRecordAdminForm
 
 class GoodsAddRecordAdmin(admin.ModelAdmin):
+    form = AddRecordAdminForm
     fieldsets = (
         (None, {
             'fields': ('goods', 'shop', 'number', )
@@ -92,7 +94,7 @@ class GoodsAddRecordAdmin(admin.ModelAdmin):
         }),
     )
     list_display = ('goods', 'shop', 'number', 'remark', 'updater', 'date', 'new_price')
-    search_fields = ['goods', 'shop']
+    search_fields = ['goods__goods_name', 'shop']
 
     @transaction.atomic
     def save_model(self, request, obj, form, change):
@@ -127,7 +129,7 @@ class ReturnRecordAdmin(admin.ModelAdmin):
         }),
     )
     list_display = ('goods', 'shop', 'amount', 'type', 'remark', 'updater', 'date')
-    search_fields = ['goods', 'shop']
+    search_fields = ['goods__goods_name', 'shop']
 
     @transaction.atomic
     def save_model(self, request, obj, form, change):
@@ -154,7 +156,7 @@ class TransferGoodsAdmin(admin.ModelAdmin):
         }),
     )
     list_display = ('goods', 'from_shop', 'to_shop', 'from_price', 'to_price', 'change_num', 'remark', 'updater', 'date')
-    search_fields = ['goods', 'from_shop', 'to_shop']
+    search_fields = ['goods__goods_name', 'from_shop', 'to_shop']
 
 
     def save_model(self, request, obj, form, change):
@@ -179,9 +181,32 @@ class GoodsSellRecordAdmin(admin.ModelAdmin):
             'fields': ('arrears',)
         }),
     )
-    list_display = ('goods', 'sell_num', 'average_price', 'sell_price', 'customer',
+    list_display = ('goods', 'sell_num', 'average_price', 'customer', 'available_data',
                     'arrears', 'remark', 'updater', 'date')
-    search_fields = ['goods']
+    search_fields = ['goods__goods_name', 'customer__user_name']
+
+    list_filter = ['date']
+
+    # actions = ['hide_sell_price']
+
+    class Media:
+        css = {
+            'all': ('store/css/price_admin.css',)
+        }
+        js = ('store/js/price_admin.js',)
+
+    def available_data(self, obj):
+        month_string = '<a href="javascript:void(0)" class="show-price">查看进价<em style="display:none">'+str(obj.sell_price)+'</em></a>'
+        return month_string
+
+    available_data.short_description = '操作项'
+    available_data.allow_tags = True
+
+    # def hide_sell_price(self, request, queryset):
+    #     self.list_display = ('goods', 'sell_num', 'average_price', 'sell_price', 'customer',
+    #                 'arrears', 'remark', 'updater', 'date')
+
+    # hide_sell_price.short_description = "显示销售价格"
 
     @transaction.atomic
     def save_model(self, request, obj, form, change):

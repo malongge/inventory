@@ -37,7 +37,10 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'selectable',
+    'searchableselect',
     'store',
+
     # 'djadmin2',
     # 'rest_framework',
 ]

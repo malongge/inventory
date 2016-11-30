@@ -23,5 +23,7 @@ from store.views import index
 urlpatterns = [
     url(r'^$', index),
     url(r'^admin/', admin.site.urls),
+    url(r'^selectable/', include('selectable.urls')),
+    url('^searchableselect/', include('searchableselect.urls')),
     # url(r'^admin2/', include(djadmin2_site.urls)),
 ]
