@@ -31,12 +31,3 @@ class AddRecordAdminForm(forms.ModelForm):
         #     owner = User.objects.create_user(username=owner.username, email='')
         self.instance.goods = goods
         return super(AddRecordAdminForm, self).save(*args, **kwargs)
-from searchableselect.widgets import SearchableSelect
-
-class GoodsAdminForm(forms.ModelForm):
-    class Meta:
-        model = Goods
-        exclude = ()
-        widgets = {
-            'category': SearchableSelect(model='store.Category', search_field='name', many=True)
-        }

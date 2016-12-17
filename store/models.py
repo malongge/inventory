@@ -1,14 +1,5 @@
 from django.db import models
 from django.contrib.auth.models import User
-from django.utils.translation import gettext_lazy as _
-# Create your models here.
-def modify_fields(**kwargs):
-    def wrap(cls):
-        for field, prop_dict in kwargs.items():
-            for prop, val in prop_dict.items():
-                setattr(cls._meta.get_field(field), prop, val)
-        return cls
-    return wrap
 
 
 class InfoModel(models.Model):
@@ -59,23 +50,6 @@ def set_user_name_verbose_name(class_name, parents, attributes):
     return type(class_name, parents, attributes)
 
 
-# class Shop(InfoModel):
-#     """
-#     进货商
-#     """
-#     # user_name = models.CharField('供货商姓名', max_length=15)
-#     shop_name = models.CharField('供货商名称', max_length=20)
-#     shop_address = models.CharField('供货商地址', max_length=100)
-#
-#     def __str__(self):
-#         return self.shop_name
-#
-#     class Meta:
-#         verbose_name = '供货商'
-#         verbose_name_plural = '供货商'
-#         ordering = ['shop_name']
-
-
 class Shop(InfoModel):
     """
     进货商
@@ -98,8 +72,8 @@ class Goods(models.Model):
     商品
     """
     goods_name = models.CharField('商品名称', max_length=15, unique=True)
-    average_price = models.FloatField('进价', default=0)
-    last_price = models.FloatField('售价', default=0)
+    average_price = models.DecimalField('进价', default=0, max_digits=10, decimal_places=2)
+    last_price = models.DecimalField('售价', default=0, max_digits=10, decimal_places=2)
     unit_name = models.CharField('单位', max_length=10)
     add_people = models.ForeignKey(User, editable=False, verbose_name='添加人')
     update_date = models.DateField('更新日期', auto_now_add=True)
@@ -126,11 +100,9 @@ class Goods(models.Model):
 
     def sell_amount(self):
         return self.remain * self.last_price
-        # current_receipt_purchase_amounts = Purchase.objects.filter(receipt__id=request.id).values_list('price',flat=True)
-        # total_amount = sum(current_receipt_purchase_amounts)
-        # return total_amount
+
     def in_amount(self):
-         return self.remain * self.average_price
+        return self.remain * self.average_price
 
     def own_amount(self):
         return self.sell_amount() - self.in_amount()
@@ -138,25 +110,6 @@ class Goods(models.Model):
     sell_amount.short_description = '销售总价'
     in_amount.short_description = '进货总价'
     own_amount.short_description = '利润'
-
-
-
-
-
-
-# class GoodsShop(Goods):
-#     """
-#     库存
-#     """
-#     in_price = models.FloatField('新进价', blank=True, null=True)
-#
-#     def __str__(self):
-#         return "%s--%s" % (self.shop, self.goods)
-#
-#     class Meta:
-#         verbose_name = '库存'
-#         verbose_name_plural = '库存'
-#         ordering = ['goods', 'remain']
 
 
 class GoodsAddRecord(models.Model):
@@ -169,7 +122,7 @@ class GoodsAddRecord(models.Model):
     remark = models.TextField('说明信息', blank=True, null=True)
     updater = models.ForeignKey(User, verbose_name='操作员')
     date = models.DateTimeField('日期', auto_now_add=True)
-    new_price = models.FloatField('新进价', blank=True, null=True)
+    new_price = models.DecimalField('新进价', blank=True, null=True, max_digits=10, decimal_places=2)
 
     class Meta:
         verbose_name = '增加库存记录'
@@ -213,8 +166,8 @@ class TransferGoods(models.Model):
     to_shop = models.ForeignKey(Shop, related_name='to_name', verbose_name='销售商')
     goods = models.ForeignKey(Goods, verbose_name='商品名称')
     change_num = models.IntegerField('交易数量')
-    from_price = models.FloatField('进价', default=0)
-    to_price = models.FloatField('售价', default=0)
+    from_price = models.DecimalField('进价', default=0, max_digits=10, decimal_places=2)
+    to_price = models.DecimalField('售价', default=0, max_digits=10, decimal_places=2)
     updater = models.ForeignKey(User, verbose_name='操作人员')
     date = models.DateTimeField('日期', auto_now_add=True)
     remark = models.TextField('说明信息', blank=True, null=True)
@@ -251,8 +204,8 @@ class Report(models.Model):
 
 class Order(models.Model):
     customer = models.ForeignKey(Customer, verbose_name='客户名称')
-    all_price = models.FloatField('总价', default=0)
-    all_profit = models.FloatField('总利润', default=0)
+    all_price = models.DecimalField('总价', default=0, max_digits=10, decimal_places=2)
+    all_profit = models.DecimalField('总利润', default=0, max_digits=10, decimal_places=2)
     is_delete = models.BooleanField('是否取消订单', default=False)
     updater = models.ForeignKey(User, verbose_name='操作人员')
     date = models.DateTimeField('日期', auto_now_add=True)
@@ -268,7 +221,7 @@ class Order(models.Model):
 
 
 class ArrearsPrice(models.Model):
-    arrears_price = models.FloatField('欠款额')
+    arrears_price = models.DecimalField('欠款额', max_digits=10, decimal_places=2)
     customer = models.ForeignKey(Customer, verbose_name='客户姓名')
     is_arrears = models.BooleanField('清除欠款', default=False)  # 是否欠款
     date = models.DateTimeField('日期', auto_now_add=True)
@@ -288,8 +241,8 @@ class GoodsSellRecord(models.Model):
     """
     goods = models.ForeignKey(Goods, verbose_name='商品名称', related_name='goods')
     sell_num = models.IntegerField('销售数目')
-    average_price = models.FloatField('进价', null=True, blank=True)
-    sell_price = models.FloatField('售价', null=True, blank=True)
+    average_price = models.DecimalField('进价', null=True, blank=True, max_digits=10, decimal_places=2)
+    sell_price = models.DecimalField('售价', null=True, blank=True, max_digits=10, decimal_places=2)
     customer = models.ForeignKey(Customer, verbose_name='客户姓名', related_name='customer', null=True, blank=True)
     remark = models.TextField('描述信息', blank=True, null=True)
     updater = models.ForeignKey(User, verbose_name='操作人员', related_name='admin')

@@ -1,12 +1,18 @@
 from django.contrib import admin
-from .models import *
-from django.db import transaction
-from django.core.exceptions import PermissionDenied
+from django.contrib.admin import register
 from django.core.exceptions import ValidationError
-from store.forms import GoodsAdminForm
-Max_Row = 13
-class GoddsAdmin(admin.ModelAdmin):
-    form = GoodsAdminForm
+from django.db import transaction
+
+from store.forms import AddRecordAdminForm
+from .models import (Goods, Customer, Category,
+                     GoodsAddRecord, GoodsSellRecord, Shop,
+                     ArrearsPrice, TransferGoods, Report,
+                     Order, ReturnRecord)
+
+
+@register(Goods)
+class GoodsAdmin(admin.ModelAdmin):
+
     fieldsets = (
         (None, {
             'fields': ('goods_name', 'average_price', 'last_price', 'unit_name', 'last_time', 'remain', 'category')
@@ -16,18 +22,20 @@ class GoddsAdmin(admin.ModelAdmin):
             'fields': ('recent_sell', 'is_delete', 'shop')
         }),
     )
+
     list_display = (
-    'goods_name', 'unit_name', 'average_price', 'last_price',  'remain', 'sell_amount', 'in_amount', 'own_amount',
-    'last_time', 'add_people', 'update_date')
+        'goods_name', 'unit_name', 'average_price', 'last_price',
+        'remain', 'sell_amount', 'in_amount', 'own_amount',
+        'last_time', 'add_people', 'update_date')
+
     list_filter = ['category']
+
     search_fields = ['goods_name']
 
     def save_model(self, request, obj, form, change):
         if getattr(obj, 'add_people', None) is None:
             obj.add_people = request.user
 
-        # if not getattr(obj, 'category', None):
-        #     raise ValidationError('未填写商品种类')
         obj.save()
 
     class Media:
@@ -37,56 +45,55 @@ class GoddsAdmin(admin.ModelAdmin):
         js = ('store/js/my_admin.js',)
 
 
+@register(Customer)
 class CustomsAdmin(admin.ModelAdmin):
+
     fieldsets = (
         (None, {
-            'fields': ('user_name', 'address', 'phone_number', )
+            'fields': ('user_name', 'address', 'phone_number',)
         }),
     )
-    list_display = ('user_name', 'address', 'phone_number', )
+
+    list_display = ('user_name', 'address', 'phone_number',)
+
     search_fields = ['user_name']
 
 
+@register(Category)
 class CategoryAdmin(admin.ModelAdmin):
+
     fieldsets = (
         (None, {
             'fields': ('name', 'remark', 'super_category')
         }),
     )
+
     list_display = ('name', 'remark', 'super_category', 'add_date',)
+
     search_fields = ['name']
 
 
+@register(Shop)
 class ShopAdmin(admin.ModelAdmin):
+
     fieldsets = (
         (None, {
             'fields': ('user_name', 'shop_name', 'phone_number', 'shop_address',)
         }),
     )
     list_display = ('user_name', 'shop_name', 'phone_number', 'shop_address', 'add_date',)
+
     search_fields = ['user_name', 'shop_name']
 
 
-# class GoodsShopAdmin(admin.ModelAdmin):
-#     fieldsets = (
-#         (None, {
-#             'fields': ('goods', 'shop', 'remain', )
-#         }),
-#     )
-#     list_display = ('goods', 'shop', 'remain', 'add_people', 'update_date',)
-#     search_fields = ['goods', 'shop']
-#
-#     def save_model(self, request, obj, form, change):
-#         if getattr(obj, 'last_updater', None) is None:
-#             obj.last_updater = request.user
-#         obj.save()
-from store.forms import AddRecordAdminForm
-
+@register(GoodsAddRecord)
 class GoodsAddRecordAdmin(admin.ModelAdmin):
+
     form = AddRecordAdminForm
+
     fieldsets = (
         (None, {
-            'fields': ('goods', 'shop', 'number', )
+            'fields': ('goods', 'shop', 'number',)
         }),
         ('选填项', {
             'classes': ('collapse',),
@@ -94,14 +101,13 @@ class GoodsAddRecordAdmin(admin.ModelAdmin):
         }),
     )
     list_display = ('goods', 'shop', 'number', 'remark', 'updater', 'date', 'new_price')
+
     search_fields = ['goods__goods_name', 'shop']
 
     @transaction.atomic
     def save_model(self, request, obj, form, change):
         if getattr(obj, 'updater', None) is None:
             obj.updater = request.user
-        # import pdb
-        # pdb.set_trace()
         records = Goods.objects.filter(pk=obj.goods.id)
         if records:
             record = records[0]
@@ -118,6 +124,7 @@ class GoodsAddRecordAdmin(admin.ModelAdmin):
         obj.save()
 
 
+@register(ReturnRecord)
 class ReturnRecordAdmin(admin.ModelAdmin):
     fieldsets = (
         (None, {
@@ -129,6 +136,7 @@ class ReturnRecordAdmin(admin.ModelAdmin):
         }),
     )
     list_display = ('goods', 'shop', 'amount', 'type', 'remark', 'updater', 'date')
+
     search_fields = ['goods__goods_name', 'shop']
 
     @transaction.atomic
@@ -145,6 +153,7 @@ class ReturnRecordAdmin(admin.ModelAdmin):
         obj.save()
 
 
+@register(TransferGoods)
 class TransferGoodsAdmin(admin.ModelAdmin):
     fieldsets = (
         (None, {
@@ -155,9 +164,9 @@ class TransferGoodsAdmin(admin.ModelAdmin):
             'fields': ('remark',)
         }),
     )
-    list_display = ('goods', 'from_shop', 'to_shop', 'from_price', 'to_price', 'change_num', 'remark', 'updater', 'date')
+    list_display = (
+    'goods', 'from_shop', 'to_shop', 'from_price', 'to_price', 'change_num', 'remark', 'updater', 'date')
     search_fields = ['goods__goods_name', 'from_shop', 'to_shop']
-
 
     def save_model(self, request, obj, form, change):
         if getattr(obj, 'updater', None) is None:
@@ -166,11 +175,12 @@ class TransferGoodsAdmin(admin.ModelAdmin):
         obj.save()
 
 
+@register(ArrearsPrice)
 class ArrearsAdmin(admin.ModelAdmin):
     list_display = ('arrears_price', 'customer', 'is_arrears', 'date')
 
-from django.utils.html import format_html
-from django.core.urlresolvers import reverse
+
+@register(GoodsSellRecord)
 class GoodsSellRecordAdmin(admin.ModelAdmin):
     fieldsets = (
         (None, {
@@ -187,8 +197,6 @@ class GoodsSellRecordAdmin(admin.ModelAdmin):
 
     list_filter = ['date']
 
-    # actions = ['hide_sell_price']
-
     class Media:
         css = {
             'all': ('store/css/price_admin.css',)
@@ -196,17 +204,13 @@ class GoodsSellRecordAdmin(admin.ModelAdmin):
         js = ('store/js/price_admin.js',)
 
     def available_data(self, obj):
-        month_string = '<a href="javascript:void(0)" class="show-price">查看进价<em style="display:none">'+str(obj.sell_price)+'</em></a>'
+        month_string = '<a href="javascript:void(0)" class="show-price">查看进价<em style="display:none">' + str(
+            obj.sell_price) + '</em></a>'
         return month_string
 
     available_data.short_description = '操作项'
+
     available_data.allow_tags = True
-
-    # def hide_sell_price(self, request, queryset):
-    #     self.list_display = ('goods', 'sell_num', 'average_price', 'sell_price', 'customer',
-    #                 'arrears', 'remark', 'updater', 'date')
-
-    # hide_sell_price.short_description = "显示销售价格"
 
     @transaction.atomic
     def save_model(self, request, obj, form, change):
@@ -216,10 +220,14 @@ class GoodsSellRecordAdmin(admin.ModelAdmin):
         obj.save()
 
 
+class ReportAdmin(admin.ModelAdmin):
+    list_display = ('title', 'alias', 'ad', 'phone', 'address', 'remark', 'date',
+                    'tag')
+
+    search_fields = ['title', 'alias', 'remark']
 
 
 class OrderMixin(object):
-
     change_list_template = 'admin/liuzhiping/change_list.html'
     report_template = 'admin/liuzhiping/report.html'
 
@@ -231,17 +239,17 @@ class OrderMixin(object):
         except AttributeError:
             return (app_label, self.model._meta.module_name,)
 
-from django.utils.encoding import force_text
-from django.contrib.admin.options import csrf_protect_m
+
 from django.conf.urls import url
 from django.http.response import HttpResponse
-from django.views.decorators.csrf import csrf_exempt
 from django.shortcuts import render
 import json
 from django.http import HttpResponseRedirect
 from django.core.urlresolvers import reverse
 from django.db.models import Q
 
+
+@register(Order)
 class OrderAdmin(OrderMixin, admin.ModelAdmin):
 
     def changelist_view(self, request, extra_context=None):
@@ -261,7 +269,7 @@ class OrderAdmin(OrderMixin, admin.ModelAdmin):
         for g in goods:
             data = {}
             data['name'] = g.goods_name
-            data['price'] = g.last_price
+            data['price'] = str(g.last_price)
             data['remain'] = g.remain
             data['unit'] = g.unit_name
             data['id'] = g.id
@@ -325,7 +333,6 @@ class OrderAdmin(OrderMixin, admin.ModelAdmin):
         ]
         return my_urls + urls
 
-
     @transaction.atomic
     def report_view(self, request):
         data = []
@@ -383,37 +390,14 @@ class OrderAdmin(OrderMixin, admin.ModelAdmin):
             cell_num += 1
             code += 1
 
-
         default_report = Report.objects.filter(tag=True).order_by('-date')[0]
 
         if ap:
             arr_p = ap.arrears_price
         else:
             arr_p = 0
-        return render(request, context={'data': data, 'report': default_report, 'price': all_price, 'customer': cust, 'arrears': arr_p,
-                                        'cell_num': range(max(Max_Row-cell_num, 0))}, template_name=self.report_template)
+        return render(request, context={'data': data, 'report': default_report, 'price': all_price, 'customer': cust,
+                                        'arrears': arr_p,
+                                        'cell_num': range(max(13 - cell_num, 0))},
+                      template_name=self.report_template)
 
-    # def obj_js(self, request):
-    #     self.change_list_template = 'admin/liuzhiping/change_list_obj.html'
-    #     categories = Category.objects.all()
-    #     goods = Goods.objects.filter(category=categories[0])
-    #     extra_context = {'categories': categories, 'goods': goods}
-    #     return super(OrderAdmin, self).changelist_view(request, extra_context)
-
-class ReportAdmin(admin.ModelAdmin):
-    list_display = ('title', 'alias', 'ad', 'phone', 'address', 'remark', 'date',
-                    'tag')
-    search_fields = ['title', 'alias', 'remark']
-
-admin.site.register(Goods, GoddsAdmin)
-admin.site.register(Customer, CustomsAdmin)
-admin.site.register(Category, CategoryAdmin)
-admin.site.register(Shop, ShopAdmin)
-# admin.site.register(GoodsShop, GoodsShopAdmin)
-admin.site.register(TransferGoods, TransferGoodsAdmin)
-admin.site.register(GoodsAddRecord, GoodsAddRecordAdmin)
-admin.site.register(ReturnRecord, ReturnRecordAdmin)
-admin.site.register(GoodsSellRecord, GoodsSellRecordAdmin)
-admin.site.register(Order, OrderAdmin)
-admin.site.register(Report, ReportAdmin)
-admin.site.register(ArrearsPrice, ArrearsAdmin)
