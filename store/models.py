@@ -249,17 +249,6 @@ class GoodsSellRecord(models.Model):
     date = models.DateTimeField('日期', auto_now_add=True)
     arrears = models.ForeignKey(ArrearsPrice, verbose_name='欠款额', related_name='arrears', null=True, blank=True)
 
-    # def account_actions(self, obj):
-    #     return format_html(
-    #         '<a class="button" href="{}">Deposit</a>&nbsp;'
-    #         '<a class="button" href="{}">Withdraw</a>',
-    #         reverse('admin:account-deposit', args=[obj.pk]),
-    #         reverse('admin:account-withdraw', args=[obj.pk]),
-    #     )
-    #
-    # account_actions.short_description = 'Account Actions'
-    # account_actions.allow_tags = True
-
     @property
     def profit(self):
         """

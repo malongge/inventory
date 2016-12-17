@@ -179,20 +179,12 @@ class TransferGoodsAdmin(admin.ModelAdmin):
 class ArrearsAdmin(admin.ModelAdmin):
     list_display = ('arrears_price', 'customer', 'is_arrears', 'date')
 
-
+from django.utils.safestring import mark_safe
 @register(GoodsSellRecord)
 class GoodsSellRecordAdmin(admin.ModelAdmin):
-    fieldsets = (
-        (None, {
-            'fields': ('customer', 'remark')
-        }),
-        ('选填项', {
-            'classes': ('collapse',),
-            'fields': ('arrears',)
-        }),
-    )
-    list_display = ('goods', 'sell_num', 'average_price', 'customer', 'available_data',
-                    'arrears', 'remark', 'updater', 'date')
+
+    list_display = ('goods', 'sell_num', 'sell_price', 'customer',
+                    'arrears', 'available_data', 'remark', 'date', )
     search_fields = ['goods__goods_name', 'customer__user_name']
 
     list_filter = ['date']
@@ -204,8 +196,8 @@ class GoodsSellRecordAdmin(admin.ModelAdmin):
         js = ('store/js/price_admin.js',)
 
     def available_data(self, obj):
-        month_string = '<a href="javascript:void(0)" class="show-price">查看进价<em style="display:none">' + str(
-            obj.sell_price) + '</em></a>'
+        month_string = mark_safe('<a href="javascript:void(0)" class="show-price">查看进价<em style="display:none">' + str(
+            obj.average_price) + '</em></a>')
         return month_string
 
     available_data.short_description = '操作项'
