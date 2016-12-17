@@ -85,7 +85,7 @@ WSGI_APPLICATION = 'inventory.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': os.path.join(BASE_DIR, 'storex.db'),
+        'NAME': os.path.join(BASE_DIR, 'store.db'),
     }
 }
 
