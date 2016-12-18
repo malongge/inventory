@@ -1,10 +1,10 @@
 {% extends "admin/base.html" %}
 {% load i18n static %}
-{% block title %}进销管理系统{% endblock %}
+{% block title %}{{ site_header|default:_('Django administration') }}{% endblock %}
 {% block extrahead %}
 {% endblock %}
 {% block branding %}
-<h1 id="site-name"><a href="{% url 'admin:index' %}">进销管理系统平台</a></h1>
+<h1 id="site-name"><a href="{% url 'admin:index' %}">{{ site_header|default:_('Django administration') }}</a></h1>
 
 {% endblock %}
 

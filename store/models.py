@@ -1,5 +1,6 @@
-from django.db import models
 from django.contrib.auth.models import User
+from django.db import models
+
 
 
 class InfoModel(models.Model):
@@ -23,6 +24,13 @@ class Customer(InfoModel):
     class Meta:
         verbose_name = '客户'
         verbose_name_plural = '客户'
+
+
+class ModelServiceMixin(object):
+
+    def _get_my_fields(self):
+        return [f.name for f in self._meta.fields]
+
 
 
 class Category(models.Model):
@@ -67,7 +75,7 @@ class Shop(InfoModel):
         ordering = ['shop_name']
 
 
-class Goods(models.Model):
+class Goods(ModelServiceMixin, models.Model):
     """
     商品
     """
@@ -75,7 +83,7 @@ class Goods(models.Model):
     average_price = models.DecimalField('进价', default=0, max_digits=10, decimal_places=2)
     last_price = models.DecimalField('售价', default=0, max_digits=10, decimal_places=2)
     unit_name = models.CharField('单位', max_length=10)
-    add_people = models.ForeignKey(User, editable=False, verbose_name='添加人')
+    updater = models.ForeignKey(User, editable=False, verbose_name='添加人')
     update_date = models.DateField('更新日期', auto_now_add=True)
     recent_sell = models.DateField('最近售出日期', blank=True, null=True)
     is_delete = models.BooleanField('下架', default=False)
@@ -148,6 +156,7 @@ class ReturnRecord(models.Model):
     updater = models.ForeignKey(User, verbose_name='操作员')
     date = models.DateTimeField('日期', auto_now_add=True)
     remark = models.TextField('说明信息', blank=True, null=True)
+    reset_price = models.DecimalField('还原价格', blank=True, null=True,  max_digits=10, decimal_places=2)
 
     class Meta:
         verbose_name = '退送库存记录'
@@ -248,6 +257,17 @@ class GoodsSellRecord(models.Model):
     updater = models.ForeignKey(User, verbose_name='操作人员', related_name='admin')
     date = models.DateTimeField('日期', auto_now_add=True)
     arrears = models.ForeignKey(ArrearsPrice, verbose_name='欠款额', related_name='arrears', null=True, blank=True)
+
+    # def account_actions(self, obj):
+    #     return format_html(
+    #         '<a class="button" href="{}">Deposit</a>&nbsp;'
+    #         '<a class="button" href="{}">Withdraw</a>',
+    #         reverse('admin:account-deposit', args=[obj.pk]),
+    #         reverse('admin:account-withdraw', args=[obj.pk]),
+    #     )
+    #
+    # account_actions.short_description = 'Account Actions'
+    # account_actions.allow_tags = True
 
     @property
     def profit(self):

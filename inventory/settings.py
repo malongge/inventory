@@ -27,11 +27,11 @@ DEBUG = True
 
 ALLOWED_HOSTS = []
 
-# BOOTSTRAP_ADMIN_SIDEBAR_MENU = True
+BOOTSTRAP_ADMIN_SIDEBAR_MENU = True
 # Application definition
 
 INSTALLED_APPS = [
-    # 'bootstrap_admin',
+    'bootstrap_admin',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
@@ -134,4 +134,23 @@ STATIC_URL = '/static/'
 #     'PAGE_SIZE': 10
 # }
 # ADMIN2_THEME_DIRECTORY = "djadmin2theme_bootstrap3"
+
+import os
+
+
+BASE_DIR = os.path.dirname(__file__)
+
+
+def root(*args):
+    return os.path.join(BASE_DIR, *args)
+
+LOCALE_PATHS = (
+    root('bootstrap_admin', 'locale'),
+    root('selectable', 'locale'),
+    root('store', 'locale'),
+)
+
+SERIALIZATION_MODULES = {
+    'alias_json': 'store.serializer'
+}
 

@@ -1,7 +1,8 @@
 from django.contrib import admin
 from django.contrib.admin import register
-from django.core.exceptions import ValidationError
 from django.db import transaction
+from django.utils.safestring import mark_safe
+from django.utils.translation import ugettext_lazy as _
 
 from store.forms import AddRecordAdminForm
 from .models import (Goods, Customer, Category,
@@ -10,9 +11,25 @@ from .models import (Goods, Customer, Category,
                      Order, ReturnRecord)
 
 
-@register(Goods)
-class GoodsAdmin(admin.ModelAdmin):
+class UpdaterAdmin(admin.ModelAdmin):
+    def save_model(self, request, obj, form, change):
+        if getattr(obj, 'updater', None) is None and request.user:
+            obj.updater = request.user
+        else:
+            raise PermissionError(_('you must login or give a operator.'))
+        return super(UpdaterAdmin, self).save_model(request, obj, form, change)
 
+
+class GoodsSaveMixin(object):
+    @transaction.atomic
+    def save_model(self, request, obj, form, change):
+        if form.cleaned_data.get('new_goods', None):
+            form.cleaned_data['new_goods'].save()
+        return super(GoodsSaveMixin, self).save_model(request, obj, form, change)
+
+
+@register(Goods)
+class GoodsAdmin(UpdaterAdmin):
     fieldsets = (
         (None, {
             'fields': ('goods_name', 'average_price', 'last_price', 'unit_name', 'last_time', 'remain', 'category')
@@ -26,17 +43,11 @@ class GoodsAdmin(admin.ModelAdmin):
     list_display = (
         'goods_name', 'unit_name', 'average_price', 'last_price',
         'remain', 'sell_amount', 'in_amount', 'own_amount',
-        'last_time', 'add_people', 'update_date')
+        'last_time', 'updater', 'update_date')
 
     list_filter = ['category']
 
     search_fields = ['goods_name']
-
-    def save_model(self, request, obj, form, change):
-        if getattr(obj, 'add_people', None) is None:
-            obj.add_people = request.user
-
-        obj.save()
 
     class Media:
         css = {
@@ -47,7 +58,6 @@ class GoodsAdmin(admin.ModelAdmin):
 
 @register(Customer)
 class CustomsAdmin(admin.ModelAdmin):
-
     fieldsets = (
         (None, {
             'fields': ('user_name', 'address', 'phone_number',)
@@ -61,7 +71,6 @@ class CustomsAdmin(admin.ModelAdmin):
 
 @register(Category)
 class CategoryAdmin(admin.ModelAdmin):
-
     fieldsets = (
         (None, {
             'fields': ('name', 'remark', 'super_category')
@@ -75,7 +84,6 @@ class CategoryAdmin(admin.ModelAdmin):
 
 @register(Shop)
 class ShopAdmin(admin.ModelAdmin):
-
     fieldsets = (
         (None, {
             'fields': ('user_name', 'shop_name', 'phone_number', 'shop_address',)
@@ -87,9 +95,11 @@ class ShopAdmin(admin.ModelAdmin):
 
 
 @register(GoodsAddRecord)
-class GoodsAddRecordAdmin(admin.ModelAdmin):
-
+class GoodsAddRecordAdmin(GoodsSaveMixin, UpdaterAdmin):
     form = AddRecordAdminForm
+
+    class Media:
+        js = ('store/js/add-goods-record-form.js',)
 
     fieldsets = (
         (None, {
@@ -104,57 +114,25 @@ class GoodsAddRecordAdmin(admin.ModelAdmin):
 
     search_fields = ['goods__goods_name', 'shop']
 
-    @transaction.atomic
-    def save_model(self, request, obj, form, change):
-        if getattr(obj, 'updater', None) is None:
-            obj.updater = request.user
-        records = Goods.objects.filter(pk=obj.goods.id)
-        if records:
-            record = records[0]
-
-            if obj.new_price:
-                if obj.new_price == 0:
-                    raise ValidationError('修改的价格不能为0')
-                record.average_price = (obj.new_price * obj.number + record.remain * record.average_price) / \
-                                       (record.remain + obj.number)
-            record.remain = record.remain + obj.number
-            record.save()
-        else:
-            raise Exception('商品还不存在，无法增加库存')
-        obj.save()
-
 
 @register(ReturnRecord)
-class ReturnRecordAdmin(admin.ModelAdmin):
+class ReturnRecordAdmin(GoodsSaveMixin, UpdaterAdmin):
     fieldsets = (
         (None, {
             'fields': ('goods', 'shop', 'amount', 'type')
         }),
         ('选填项', {
             'classes': ('collapse',),
-            'fields': ('remark',)
+            'fields': ('remark', 'reset_price')
         }),
     )
-    list_display = ('goods', 'shop', 'amount', 'type', 'remark', 'updater', 'date')
+    list_display = ('goods', 'shop', 'amount', 'type', 'remark', 'reset_price', 'updater', 'date')
 
     search_fields = ['goods__goods_name', 'shop']
 
-    @transaction.atomic
-    def save_model(self, request, obj, form, change):
-        if getattr(obj, 'updater', None) is None:
-            obj.updater = request.user
-        records = Goods.objects.filter(pk=obj.goods.id)
-        if records:
-            record = records[0]
-            record.remain = record.remain + obj.amount
-            record.save()
-        else:
-            raise ValidationError("库存中还没有这个商品无法进行退送")
-        obj.save()
-
 
 @register(TransferGoods)
-class TransferGoodsAdmin(admin.ModelAdmin):
+class TransferGoodsAdmin(UpdaterAdmin):
     fieldsets = (
         (None, {
             'fields': ('goods', 'from_shop', 'to_shop', 'from_price', 'to_price', 'change_num')
@@ -165,26 +143,19 @@ class TransferGoodsAdmin(admin.ModelAdmin):
         }),
     )
     list_display = (
-    'goods', 'from_shop', 'to_shop', 'from_price', 'to_price', 'change_num', 'remark', 'updater', 'date')
+        'goods', 'from_shop', 'to_shop', 'from_price', 'to_price', 'change_num', 'remark', 'updater', 'date')
     search_fields = ['goods__goods_name', 'from_shop', 'to_shop']
-
-    def save_model(self, request, obj, form, change):
-        if getattr(obj, 'updater', None) is None:
-            obj.updater = request.user
-
-        obj.save()
 
 
 @register(ArrearsPrice)
 class ArrearsAdmin(admin.ModelAdmin):
     list_display = ('arrears_price', 'customer', 'is_arrears', 'date')
 
-from django.utils.safestring import mark_safe
-@register(GoodsSellRecord)
-class GoodsSellRecordAdmin(admin.ModelAdmin):
 
+@register(GoodsSellRecord)
+class GoodsSellRecordAdmin(UpdaterAdmin):
     list_display = ('goods', 'sell_num', 'sell_price', 'customer',
-                    'arrears', 'available_data', 'remark', 'date', )
+                    'arrears', 'available_data', 'remark', 'date',)
     search_fields = ['goods__goods_name', 'customer__user_name']
 
     list_filter = ['date']
@@ -203,13 +174,6 @@ class GoodsSellRecordAdmin(admin.ModelAdmin):
     available_data.short_description = '操作项'
 
     available_data.allow_tags = True
-
-    @transaction.atomic
-    def save_model(self, request, obj, form, change):
-        if getattr(obj, 'updater', None) is None:
-            obj.updater = request.user
-
-        obj.save()
 
 
 class ReportAdmin(admin.ModelAdmin):
@@ -240,10 +204,12 @@ from django.http import HttpResponseRedirect
 from django.core.urlresolvers import reverse
 from django.db.models import Q
 
+from django.core import serializers
 
+
+# alias_serializer = JSONSerializer().set_alias({'goods_name': 'name', 'last_price': 'price', 'unit_name': 'unit'})
 @register(Order)
 class OrderAdmin(OrderMixin, admin.ModelAdmin):
-
     def changelist_view(self, request, extra_context=None):
         categories = Category.objects.all()
         goods = Goods.objects.filter(category=categories[0])
@@ -256,53 +222,38 @@ class OrderAdmin(OrderMixin, admin.ModelAdmin):
     def change_view(self, request, object_id, form_url='', extra_context=None):
         return super(OrderAdmin, self).changeform_view(request, object_id, form_url, extra_context)
 
-    def _goods_to_json(self, goods):
-        ret = []
-        for g in goods:
-            data = {}
-            data['name'] = g.goods_name
-            data['price'] = str(g.last_price)
-            data['remain'] = g.remain
-            data['unit'] = g.unit_name
-            data['id'] = g.id
-            ret.append(data)
-        return ret
+    def _get_goods_serialize(self, goods):
+        return serializers.serialize("alias_json",
+            goods,
+            fields=('id', 'goods_name', 'last_price', 'remain', 'unit_name'),
+            alias={'goods_name': 'name', 'last_price': 'price', 'unit_name': 'unit'}
+        )
+
+    def _get_user_serialize(self, users):
+        return serializers.serialize("alias_json",
+            users,
+            fields=('id', 'user_name', 'phone_number'),
+            alias={'user_name': 'name', 'phone_number': 'phone'}
+        )
 
     def search_goods_view(self, request):
-        search = request.POST.get('search_text', None)
+        search = request.GET.get('search_text', None)
         if not search:
             return HttpResponse(json.dumps([]), content_type="application/json")
         # goods = Goods.objects.filter(Q(goods_name__icontains=search) | Q(shop__shop_name__icontains=search))
         goods = Goods.objects.filter(Q(goods_name__icontains=search))
-        return HttpResponse(json.dumps(self._goods_to_json(goods)), content_type="application/json")
+        return HttpResponse(self._get_goods_serialize(goods), content_type="application/json")
 
     def search_customer_view(self, request):
-        search = request.POST.get('search_text', None)
+        search = request.GET.get('search_text', None)
         if not search:
             return HttpResponse(json.dumps([]), content_type="application/json")
         users = Customer.objects.filter(Q(user_name__icontains=search))
-        user_list = []
-        for u in users:
-            user_dict = {}
-            user_dict['name'] = u.user_name
-            user_dict['phone'] = u.phone_number
-            user_dict['id'] = u.id
-            user_list.append(user_dict)
-        return HttpResponse(json.dumps(user_list), content_type="application/json")
+        return HttpResponse(self._get_user_serialize(users), content_type="application/json")
 
     def goods_list_view(self, request, cat_id):
         goods = Goods.objects.filter(category=cat_id)
-        ret = self._goods_to_json(goods)
-        # ret = []
-        # for g in goods:
-        #     data = {}
-        #     data['name'] = g.goods_name
-        #     data['price'] = g.last_price
-        #     data['remain'] = g.remain
-        #     data['unit'] = g.unit_name
-        #     data['id'] = g.id
-        #     ret.append(data)
-        return HttpResponse(json.dumps(ret), content_type="application/json")
+        return HttpResponse(self._get_goods_serialize(goods), content_type="application/json")
 
     def get_urls(self):
         urls = super(OrderAdmin, self).get_urls()
@@ -392,4 +343,3 @@ class OrderAdmin(OrderMixin, admin.ModelAdmin):
                                         'arrears': arr_p,
                                         'cell_num': range(max(13 - cell_num, 0))},
                       template_name=self.report_template)
-

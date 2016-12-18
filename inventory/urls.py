@@ -15,8 +15,7 @@ Including another URLconf
 """
 from django.conf.urls import url, include
 from django.contrib import admin
-# from djadmin2.site import djadmin2_site
-from store.views import index
+from .views import index
 
 # djadmin2_site.autodiscover()
 
@@ -24,4 +23,5 @@ urlpatterns = [
     url(r'^$', index),
     url(r'^admin/', admin.site.urls),
     url(r'^selectable/', include('selectable.urls')),
+    url(r'goods/', include('store.urls')),
 ]

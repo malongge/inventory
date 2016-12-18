@@ -142,13 +142,12 @@
 
             var that = this;
             $.ajax({
-                type: "post",
+                type: "get",
                 url: url,
                 // headers: {
                 //     csrfmiddlewaretoken: window.CSRF_TOKEN
                 // },
                 data: {
-                    csrfmiddlewaretoken: window.CSRF_TOKEN,
                     search_text: search_text
                 },
                 beforeSend: function (XMLHttpRequest) {
@@ -187,13 +186,12 @@
                 return
             }
             $.ajax({
-                type: "post",
+                type: "get",
                 url: url,
                 // headers: {
                 //     csrfmiddlewaretoken: window.CSRF_TOKEN
                 // },
                 data: {
-                    csrfmiddlewaretoken: window.CSRF_TOKEN,
                     search_text: search_text
                 },
                 beforeSend: function (XMLHttpRequest) {
