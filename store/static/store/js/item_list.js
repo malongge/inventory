@@ -241,7 +241,7 @@
             tr_obj['alias'] = data[0];
             tr_obj['price'] = parseFloat(data[1]);
 
-            if (tr_obj['num'] < 1 || tr_obj['num'] > parseInt(data[3])) {
+            if (tr_obj['num'] < 0.01 || tr_obj['num'] > parseInt(data[3])) {
                 that.showErrorNote('购买的数量不能为0，也不能大于库存的数量');
             }
             else {
