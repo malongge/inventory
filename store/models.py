@@ -40,7 +40,7 @@ class Category(models.Model):
     remark = models.TextField('描述信息', blank=True, null=True)
     name = models.CharField('类别名称', max_length=20)
     add_date = models.DateField('添加日期', auto_now_add=True)
-    super_category = models.ForeignKey("self", verbose_name='所属分类', null=True, blank=True)
+    super_category = models.ForeignKey("Category", verbose_name='所属分类', null=True, blank=True, related_name='parent_category')
 
     def __str__(self):
         return self.name
@@ -89,7 +89,7 @@ class Goods(ModelServiceMixin, models.Model):
     is_delete = models.BooleanField('下架', default=False)
     category = models.ManyToManyField(Category, verbose_name='所属类别')
     shop = models.ForeignKey(Shop, verbose_name='供应商名称', blank=True, null=True)
-    remain = models.IntegerField('库存量', default=0)
+    remain = models.DecimalField('数目', max_digits=6, decimal_places=2, default=0)
     last_time = models.DateField('有效期', blank=True, null=True)
 
     def __str__(self):
@@ -126,7 +126,7 @@ class GoodsAddRecord(models.Model):
     """
     goods = models.ForeignKey(Goods, verbose_name='商品名称')
     shop = models.ForeignKey(Shop, verbose_name='供应商')
-    number = models.IntegerField('数目')
+    number = models.DecimalField('数目', max_digits=6, decimal_places=2)
     remark = models.TextField('说明信息', blank=True, null=True)
     updater = models.ForeignKey(User, verbose_name='操作员')
     date = models.DateTimeField('日期', auto_now_add=True)
@@ -151,7 +151,7 @@ class ReturnRecord(models.Model):
     )
     goods = models.ForeignKey(Goods, verbose_name='商品名称')
     shop = models.ForeignKey(Shop, verbose_name='供货商名称')
-    amount = models.IntegerField(verbose_name='数量')
+    amount = models.DecimalField('数目', max_digits=6, decimal_places=2)
     type = models.IntegerField('退送原因', choices=TYPE_IN_CHOICES)
     updater = models.ForeignKey(User, verbose_name='操作员')
     date = models.DateTimeField('日期', auto_now_add=True)
@@ -174,7 +174,7 @@ class TransferGoods(models.Model):
     from_shop = models.ForeignKey(Shop, related_name='from_shop', verbose_name='供应商')
     to_shop = models.ForeignKey(Shop, related_name='to_name', verbose_name='销售商')
     goods = models.ForeignKey(Goods, verbose_name='商品名称')
-    change_num = models.IntegerField('交易数量')
+    change_num = models.DecimalField('数目', max_digits=6, decimal_places=2)
     from_price = models.DecimalField('进价', default=0, max_digits=10, decimal_places=2)
     to_price = models.DecimalField('售价', default=0, max_digits=10, decimal_places=2)
     updater = models.ForeignKey(User, verbose_name='操作人员')
@@ -249,7 +249,7 @@ class GoodsSellRecord(models.Model):
     卖出商品记录
     """
     goods = models.ForeignKey(Goods, verbose_name='商品名称', related_name='goods')
-    sell_num = models.IntegerField('销售数目')
+    sell_num = models.DecimalField('数目', max_digits=6, decimal_places=2)
     average_price = models.DecimalField('进价', null=True, blank=True, max_digits=10, decimal_places=2)
     sell_price = models.DecimalField('售价', null=True, blank=True, max_digits=10, decimal_places=2)
     customer = models.ForeignKey(Customer, verbose_name='客户姓名', related_name='customer', null=True, blank=True)

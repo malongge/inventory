@@ -110,6 +110,7 @@ class AutoCompleteSelectMultipleField(BaseAutoCompleteField):
         super(AutoCompleteSelectMultipleField, self).__init__(*args, **kwargs)
 
     def to_python(self, value):
+
         if value in EMPTY_VALUES:
             return []
         lookup = self.lookup_class()

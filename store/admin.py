@@ -1,8 +1,17 @@
+import json
+
 from django.contrib import admin
 from django.contrib.admin import register
 from django.db import transaction
 from django.utils.safestring import mark_safe
 from django.utils.translation import ugettext_lazy as _
+from django.conf.urls import url
+from django.http.response import HttpResponse
+from django.shortcuts import render
+from django.http import HttpResponseRedirect
+from django.core.urlresolvers import reverse
+from django.db.models import Q
+from django.core import serializers
 
 from store.forms import AddRecordAdminForm
 from .models import (Goods, Customer, Category,
@@ -196,17 +205,6 @@ class OrderMixin(object):
             return (app_label, self.model._meta.module_name,)
 
 
-from django.conf.urls import url
-from django.http.response import HttpResponse
-from django.shortcuts import render
-import json
-from django.http import HttpResponseRedirect
-from django.core.urlresolvers import reverse
-from django.db.models import Q
-
-from django.core import serializers
-
-
 # alias_serializer = JSONSerializer().set_alias({'goods_name': 'name', 'last_price': 'price', 'unit_name': 'unit'})
 @register(Order)
 class OrderAdmin(OrderMixin, admin.ModelAdmin):
@@ -224,17 +222,17 @@ class OrderAdmin(OrderMixin, admin.ModelAdmin):
 
     def _get_goods_serialize(self, goods):
         return serializers.serialize("alias_json",
-            goods,
-            fields=('id', 'goods_name', 'last_price', 'remain', 'unit_name'),
-            alias={'goods_name': 'name', 'last_price': 'price', 'unit_name': 'unit'}
-        )
+                                     goods,
+                                     fields=('id', 'goods_name', 'last_price', 'remain', 'unit_name'),
+                                     alias={'goods_name': 'name', 'last_price': 'price', 'unit_name': 'unit'}
+                                     )
 
     def _get_user_serialize(self, users):
         return serializers.serialize("alias_json",
-            users,
-            fields=('id', 'user_name', 'phone_number'),
-            alias={'user_name': 'name', 'phone_number': 'phone'}
-        )
+                                     users,
+                                     fields=('id', 'user_name', 'phone_number'),
+                                     alias={'user_name': 'name', 'phone_number': 'phone'}
+                                     )
 
     def search_goods_view(self, request):
         search = request.GET.get('search_text', None)

@@ -15,7 +15,6 @@ import os
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
-
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/1.9/howto/deployment/checklist/
 
@@ -32,12 +31,16 @@ BOOTSTRAP_ADMIN_SIDEBAR_MENU = True
 
 INSTALLED_APPS = [
     # 'bootstrap_admin',
-    'django.contrib.admin',
+    'suit_dashboard',
+    'suit',
+    # 'django.contrib.admin',
+    'django.contrib.admin.apps.SimpleAdminConfig',
     'django.contrib.auth',
     'django.contrib.contenttypes',
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'dashboard',
     'selectable',
     'store',
 ]
@@ -78,7 +81,6 @@ TEMPLATES = [
 
 WSGI_APPLICATION = 'inventory.wsgi.application'
 
-
 # Database
 # https://docs.djangoproject.com/en/1.9/ref/settings/#databases
 
@@ -88,7 +90,6 @@ DATABASES = {
         'NAME': os.path.join(BASE_DIR, 'store.db'),
     }
 }
-
 
 # Password validation
 # https://docs.djangoproject.com/en/1.9/ref/settings/#auth-password-validators
@@ -108,7 +109,6 @@ AUTH_PASSWORD_VALIDATORS = [
     },
 ]
 
-
 # Internationalization
 # https://docs.djangoproject.com/en/1.9/topics/i18n/
 
@@ -121,7 +121,6 @@ USE_I18N = True
 USE_L10N = True
 
 USE_TZ = True
-
 
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/1.9/howto/static-files/
@@ -137,12 +136,12 @@ STATIC_URL = '/static/'
 
 import os
 
-
 BASE_DIR = os.path.dirname(__file__)
 
 
 def root(*args):
     return os.path.join(BASE_DIR, '..', *args)
+
 
 LOCALE_PATHS = (
     root('bootstrap_admin', 'locale'),
@@ -154,3 +153,16 @@ SERIALIZATION_MODULES = {
     'alias_json': 'store.serializer'
 }
 
+SUIT_CONFIG = {
+    'ADMIN_NAME': '进销管理系统',
+    'HEADER_DATE_FORMAT': 'Y F l',  # Saturday, 16th March 2013
+    'HEADER_TIME_FORMAT': 'H:i',  # 18:42
+    'MENU': (
+        'sites',
+        'store',
+        'auth',
+        # {'app': 'store', 'icon': 'icon-chevron-right', 'models': '__all__'},
+        {'label': '下订单', 'icon': 'icon-fire', 'url': '/admin/sells'},
+        {'label': '统计信息', 'icon': 'icon-question-sign', 'url': '/admin/statistics'},
+    ),
+}

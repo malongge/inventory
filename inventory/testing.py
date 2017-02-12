@@ -24,3 +24,17 @@ DATABASES = {
 
 SOUTH_TESTS_MIGRATE = True
 DEFAULT_FILE_STORAGE = 'inmemorystorage.InMemoryStorage'
+
+INSTALLED_APPS = [
+    # 'bootstrap_admin',
+    'django.contrib.admin',
+    'django.contrib.auth',
+    'django.contrib.contenttypes',
+    'django.contrib.sessions',
+    'django.contrib.messages',
+    'django.contrib.staticfiles',
+    'selectable',
+    'store',
+    'selectabletest',
+    'tests.jsonview.jsonviewtest',
+]

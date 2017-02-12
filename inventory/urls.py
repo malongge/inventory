@@ -16,12 +16,15 @@ Including another URLconf
 from django.conf.urls import url, include
 from django.contrib import admin
 from .views import index
-
+from dashboard.sites import DashboardSite
 # djadmin2_site.autodiscover()
+admin.site = DashboardSite()
+admin.sites.site = admin.site
+admin.autodiscover()
 
 urlpatterns = [
     url(r'^$', index),
     url(r'^admin/', admin.site.urls),
     url(r'^selectable/', include('selectable.urls')),
-    url(r'goods/', include('store.urls')),
+    url(r'store/', include('store.urls')),
 ]

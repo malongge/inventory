@@ -18,11 +18,13 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import os
+
 os.environ.setdefault("DJANGO_SETTINGS_MODULE", "inventory.testing")
 
-import pytest
+from django.conf import settings
 import django
 
-#
-# def pytest_configure(config):
-#     django.setup()
+
+def pytest_configure(config):
+    settings.DEBUG = False
+    django.setup()
