@@ -7,7 +7,7 @@ from django.utils.translation import ugettext_lazy as _
 from suit_dashboard.layout import Grid, Row, Column
 from suit_dashboard.views import DashboardView
 from suit_dashboard.box import Box
-from .box import BoxMachine
+from .box import BoxMachine,BoxSellStatistics
 
 
 class HomeView(DashboardView):
@@ -16,7 +16,7 @@ class HomeView(DashboardView):
     crumbs = (
         {'url': 'admin:statistics', 'name': '统计信息'},
     )
-    grid = Grid(Row(Column(BoxMachine(), width=6)))
+    grid = Grid(Row(Column(BoxSellStatistics(), width=6)))
 
     # template_name = 'dashboard/main.html'
     #

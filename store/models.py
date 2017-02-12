@@ -2,7 +2,6 @@ from django.contrib.auth.models import User
 from django.db import models
 
 
-
 class InfoModel(models.Model):
     address = models.CharField('联系地址', max_length=100, blank=True, null=True)
     phone_number = models.CharField('联系电话', max_length=20)
@@ -27,10 +26,8 @@ class Customer(InfoModel):
 
 
 class ModelServiceMixin(object):
-
     def _get_my_fields(self):
         return [f.name for f in self._meta.fields]
-
 
 
 class Category(models.Model):
@@ -40,7 +37,8 @@ class Category(models.Model):
     remark = models.TextField('描述信息', blank=True, null=True)
     name = models.CharField('类别名称', max_length=20)
     add_date = models.DateField('添加日期', auto_now_add=True)
-    super_category = models.ForeignKey("Category", verbose_name='所属分类', null=True, blank=True, related_name='parent_category')
+    super_category = models.ForeignKey("Category", verbose_name='所属分类', null=True, blank=True,
+                                       related_name='parent_category')
 
     def __str__(self):
         return self.name
@@ -156,7 +154,7 @@ class ReturnRecord(models.Model):
     updater = models.ForeignKey(User, verbose_name='操作员')
     date = models.DateTimeField('日期', auto_now_add=True)
     remark = models.TextField('说明信息', blank=True, null=True)
-    reset_price = models.DecimalField('还原价格', blank=True, null=True,  max_digits=10, decimal_places=2)
+    reset_price = models.DecimalField('还原价格', blank=True, null=True, max_digits=10, decimal_places=2)
 
     class Meta:
         verbose_name = '退送库存记录'
@@ -191,7 +189,6 @@ class TransferGoods(models.Model):
 
 
 class Report(models.Model):
-
     title = models.CharField('标题', max_length=100, default='志平电子配件销售清单')
     alias = models.CharField('模板名字', max_length=20, default='默认模板')
     ad = models.TextField('广告语')
@@ -242,6 +239,34 @@ class ArrearsPrice(models.Model):
         verbose_name = '欠款记录'
         verbose_name_plural = '欠款记录'
         ordering = ['-date']
+from django.db import connection
+
+class SellRecordManager(models.Manager):
+    def month_statistic(self, year):
+
+        with connection.cursor() as cursor:
+            sql_str = "select count(t.sell_num) as count, substr(t.date,6,2) as month, " \
+                      "sum(t.sell_price * t.sell_num) as sell_total, sum(t.average_price * t.sell_num ) as average_total " \
+                      "from store_goodssellrecord  as t where t.date like %s group by substr(t.date,1,7);"
+            cursor.execute(sql_str, [year + '%'])
+            result_list = []
+            for row in cursor.fetchall():
+                p = {'count': row[0], 'month': row[1], 'sells': row[2], 'averages': row[3]}
+                result_list.append(p)
+        return result_list
+
+    def year_statistic(self):
+        with connection.cursor() as cursor:
+            sql_str = "select count(t.sell_num) as count, substr(t.date,1,4) as year, " \
+                      "sum(t.sell_price * t.sell_num) as sell_total, sum(t.average_price * t.sell_num ) as average_total " \
+                      "from store_goodssellrecord  as t group by substr(t.date,1,4);"
+            cursor.execute(sql_str)
+            result_list = []
+            for row in cursor.fetchall():
+                p = {'count': row[0], 'year': row[1], 'sells': row[2], 'averages': row[3]}
+                result_list.append(p)
+        return result_list
+
 
 
 class GoodsSellRecord(models.Model):
@@ -268,6 +293,7 @@ class GoodsSellRecord(models.Model):
     #
     # account_actions.short_description = 'Account Actions'
     # account_actions.allow_tags = True
+    statistic_objects = SellRecordManager()
 
     @property
     def profit(self):

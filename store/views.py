@@ -74,3 +74,10 @@ class GoodsSearchJSONListView(PaginatedJSONListSearchView):
     serialize_mtm = True
     serialize_mto = True
     # count_only = True
+
+def test_objects(request):
+    from .models import GoodsSellRecord
+    import json
+    data = GoodsSellRecord.statistic_objects.month_statistic('2016')
+    # data = GoodsSellRecord.statistic_objects.year_statistic()
+    return HttpResponse(json.dumps(data))
