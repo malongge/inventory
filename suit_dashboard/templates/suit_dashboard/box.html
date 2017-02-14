@@ -94,6 +94,13 @@
                 } catch (err) {
                   console.log(err);
                 }
+                try {
+                  if (dataset.xAxis.labels.formatter) {
+                    dataset.xAxis.labels.formatter = new Function(dataset.xAxis.labels.formatter);
+                  }
+                } catch (err) {
+                  console.log(err);
+                }
                 $('#{% if box.html_id %}{{ box.html_id }}-{% endif %}{{ item.html_id }}').highcharts(dataset);
               </script>
             {% endif %}

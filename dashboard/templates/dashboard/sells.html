@@ -2,13 +2,45 @@
 {% load i18n admin_static %}
 
 {% block title %}
-  Title in browser tab
+  下订单页面
 {% endblock %}
 
 {% block dashboard_css %}
-  <link href="{% static 'dashboard/css/main.css' %}" rel="stylesheet" media="all">
+  <link href="{% static 'dashboard/css/order.css' %}" rel="stylesheet" media="all">
+{% endblock %}
+
+{% block content %}
+    <div id="obj-error-note">
+    <p class="errornote">
+    请更正下列错误。
+    </p></div>
+    <div class="obj-no-display" id="shade-block">
+            <div class="pop-panel">
+                <div style="display: flex;">
+                <input type="text" size="40" name="q" id="search-user-bar" autofocus="" style="width: 200px; margin-right: 20px;">
+                <input id="user-search" value="搜索" type="submit" name="{% url 'admin:store_order_custom-search-list' %}">
+                </div>
+                <div class="table-body"></div>
+                <a href="javascript:void(0);" id="exit-panel" style="float: right; margin-top: 60px;">退出面板</a>
+            </div>
+        </div>
+  {% for row in dashboard_grid.rows %}
+    {% include "suit_dashboard/row.html" %}
+  {% endfor %}
 {% endblock %}
 
 {% block dashboard_js %}
-
+<script src="{% static 'dashboard/js/order.js'%}"></script>
+    <script src="{% static 'dashboard/js/item_list.js' %}"></script>
+    <script>
+        window.CSRF_TOKEN = "{{ csrf_token }}";
+        window.report_url = "{% url 'admin:store_order_report' %}";
+    (function ($) {
+    $(document).ready(function () {
+        OrderReport.init({
+                //
+        });
+    });
+    })(Suit.$);
+    </script>
 {% endblock %}

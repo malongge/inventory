@@ -13,11 +13,11 @@ from django.core.urlresolvers import reverse
 from django.db.models import Q
 from django.core import serializers
 
-from store.forms import AddRecordAdminForm
+from store.forms import AddRecordAdminForm, ReturnRecordForm
 from .models import (Goods, Customer, Category,
                      GoodsAddRecord, GoodsSellRecord, Shop,
                      ArrearsPrice, TransferGoods, Report,
-                     Order, ReturnRecord)
+                     Order, ReturnRecord, RecordHistory)
 
 
 class UpdaterAdmin(admin.ModelAdmin):
@@ -121,23 +121,25 @@ class GoodsAddRecordAdmin(GoodsSaveMixin, UpdaterAdmin):
     )
     list_display = ('goods', 'shop', 'number', 'remark', 'updater', 'date', 'new_price')
 
-    search_fields = ['goods__goods_name', 'shop']
+    search_fields = ['goods__goods_name', 'shop__shop_name']
 
 
 @register(ReturnRecord)
 class ReturnRecordAdmin(GoodsSaveMixin, UpdaterAdmin):
     fieldsets = (
         (None, {
-            'fields': ('goods', 'shop', 'amount', 'type')
+            'fields': ('goods', 'shop', 'amount', 'customer', 'type')
         }),
         ('选填项', {
             'classes': ('collapse',),
-            'fields': ('remark', 'reset_price')
+            'fields': ('remark', 'reset_price',)
         }),
     )
-    list_display = ('goods', 'shop', 'amount', 'type', 'remark', 'reset_price', 'updater', 'date')
+    list_display = ('goods', 'shop', 'amount', 'type', 'remark', 'customer', 'reset_price', 'updater', 'date')
 
-    search_fields = ['goods__goods_name', 'shop']
+    search_fields = ['goods__goods_name', 'shop__shop_name']
+
+    form = ReturnRecordForm
 
 
 @register(TransferGoods)
@@ -153,13 +155,22 @@ class TransferGoodsAdmin(UpdaterAdmin):
     )
     list_display = (
         'goods', 'from_shop', 'to_shop', 'from_price', 'to_price', 'change_num', 'remark', 'updater', 'date')
-    search_fields = ['goods__goods_name', 'from_shop', 'to_shop']
+    search_fields = ['goods__goods_name', 'from_shop__shop_name', 'to_shop__shop_name']
 
 
 @register(ArrearsPrice)
 class ArrearsAdmin(admin.ModelAdmin):
+    # actions = ['hide_none_arrears']
     list_display = ('arrears_price', 'customer', 'is_arrears', 'date')
 
+    def get_queryset(self, request):
+        qs = super(ArrearsAdmin, self).get_queryset(request)
+        return qs.filter(is_arrears=False)
+
+    # def hide_none_arrears(self, request, queryset):
+    #     queryset.update(is_arrears=False)
+    #
+    # hide_none_arrears.short_description = "隐藏结清款项的用户"
 
 @register(GoodsSellRecord)
 class GoodsSellRecordAdmin(UpdaterAdmin):
@@ -206,6 +217,14 @@ class OrderMixin(object):
 
 
 # alias_serializer = JSONSerializer().set_alias({'goods_name': 'name', 'last_price': 'price', 'unit_name': 'unit'})
+@register(RecordHistory)
+class RecordHistoryAdmin(admin.ModelAdmin):
+    list_display = ('customer', 'date', 'view_record')
+
+
+import datetime
+
+
 @register(Order)
 class OrderAdmin(OrderMixin, admin.ModelAdmin):
     def changelist_view(self, request, extra_context=None):
@@ -274,6 +293,12 @@ class OrderAdmin(OrderMixin, admin.ModelAdmin):
         ]
         return my_urls + urls
 
+    def get_model_perms(self, request):
+        """
+        Return empty perms dict thus hiding the model from admin index.
+        """
+        return {}
+
     @transaction.atomic
     def report_view(self, request):
         data = []
@@ -313,7 +338,9 @@ class OrderAdmin(OrderMixin, admin.ModelAdmin):
             ap = ArrearsPrice.objects.create(arrears_price=arr, customer=cust)
         else:
             ap = None
-
+        date = datetime.datetime.now()
+        default_report = Report.objects.filter(tag=True).order_by('-date')[0]
+        record = RecordHistory.objects.create(customer=cust, report=default_report, arrears=ap, date=date)
         for key, value in data_all['list_data'].items():
             g = Goods.objects.get(id=key)
             g.num = value['num']
@@ -327,11 +354,10 @@ class OrderAdmin(OrderMixin, admin.ModelAdmin):
             data.append(g)
             GoodsSellRecord.objects.create(goods=g, sell_num=g.num, updater=request.user,
                                            average_price=g.average_price,
-                                           sell_price=price, customer=cust, arrears=ap)
+                                           sell_price=price, customer=cust, arrears=ap, record=record)
+
             cell_num += 1
             code += 1
-
-        default_report = Report.objects.filter(tag=True).order_by('-date')[0]
 
         if ap:
             arr_p = ap.arrears_price
@@ -339,5 +365,6 @@ class OrderAdmin(OrderMixin, admin.ModelAdmin):
             arr_p = 0
         return render(request, context={'data': data, 'report': default_report, 'price': all_price, 'customer': cust,
                                         'arrears': arr_p,
-                                        'cell_num': range(max(13 - cell_num, 0))},
+                                        'cell_num': range(max(13 - cell_num, 0)),
+                                        'my_time': date.strftime('%Y{}%m{}%d{}').format('年', '月', '日')},
                       template_name=self.report_template)

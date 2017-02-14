@@ -1,5 +1,5 @@
 from django.conf.urls import url
-from .views import search_customer_view, search_goods_view, goods_list_view
+from .views import search_customer_view, search_goods_view, goods_list_view, view_record
 from .views import GoodsJson,test_objects, GoodsListJson, GoodsPaginatedJSONListView,GoodsSearchJSONListView
 urlpatterns = [
     url(r'^search-goods$', search_goods_view, name='search_goods'),
@@ -7,5 +7,6 @@ urlpatterns = [
     url(r'^filter-by-cate$', goods_list_view, name='filter_goods_by_category'),
     url(r'json', GoodsJson.as_view()),
     url(r'search', GoodsSearchJSONListView.as_view()),
-    url(r'objects', test_objects)
+    url(r'objects', test_objects),
+    url(r'view_record/(\d+)', view_record, name='record_view')
 ]

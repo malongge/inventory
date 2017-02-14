@@ -1,0 +1,16 @@
+{% load i18n admin_static suit_list admin_list suit_tags %}
+<div id="toolbar" class="clearfix">
+    <div id="changelist-search" action="" method="get" class="form-inline">
+        <div class="search-container">
+            <input type="text" size="40" name="q" id="searchbar" placeholder="
+                    输入搜索关键字" {{ cl.query|yesno:' class=active,' }}>&nbsp;
+            <script type="text/javascript">document.getElementById("searchbar").focus();</script>
+            <input type="submit" value="搜索" class="btn btn-info" id="obj-search"
+                   name="{% url 'admin:store_order_goods-search-list' %}"/>
+            &nbsp;
+
+        </div>
+
+
+    </div>
+</div>

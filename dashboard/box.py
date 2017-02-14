@@ -117,19 +117,27 @@ class BoxMachine(Box):
         # Return the list of items
         return [item_info, item_chart]
 
-from decimal import  Decimal
+
+from decimal import Decimal
+
+
 class BoxSellStatistics(Box):
-    # def get_title(self):
-    #     return '商品盈利表'
+    def __init__(self, **kwargs):
+        self.year = kwargs.get('year', '2016')
+        super(BoxSellStatistics, self).__init__(**kwargs)
+
+    def get_title(self):
+        return '商品盈利表'
 
     def get_description(self):
-        return '统计 2016 全年各个月份盈利情况'
+        return '统计 {} 全年各个月份盈利情况'.format(self.year)
 
     # The get_items function is the main function here. It will define
     # what are the contents of the box.
     def get_items(self):
-        data = GoodsSellRecord.statistic_objects.month_statistic('2016')
+        data = GoodsSellRecord.statistic_objects.month_statistic(self.year)
         # value
+
         monthes = []
         sell_counts = []
         average_counts = []
@@ -162,12 +170,15 @@ class BoxSellStatistics(Box):
                 'type': 'bar'
             },
             'title': {
-                'text': '2016 全年盈利图表'
+                'text': '{} 全年盈利图表'.format(self.year)
+            },
+            'subtitle': {
+                'text': '全年总销售额--{} ,总利润--{}'.format(sum(sell_counts), sum(profit_counts))
             },
             'xAxis': {
                 'categories': monthes,
                 'title': {
-                    'text': None
+                    'text': '月份'
                 }
             },
             'yAxis': {
@@ -181,6 +192,8 @@ class BoxSellStatistics(Box):
                 }
             },
             'tooltip': {
+                'headerFormat': '<b>{point.x}月份</b><br>',
+                'valuePrefix': '￥',
                 'valueSuffix': '元'
             },
             'plotOptions': {
@@ -209,9 +222,118 @@ class BoxSellStatistics(Box):
 
         # Create the chart item
         item_chart = Item(
-            html_id='highchart-sell-statistics',
+            html_id='highchart-{}-sell-statistics'.format(self.year),
             value=chart_options,
             display=Item.AS_HIGHCHARTS)
 
         # Return the list of items
         return [item_chart]
+
+
+from datetime import datetime
+
+
+class DaySellStatistics(BoxSellStatistics):
+    def get_title(self):
+        return '趋势走向表'
+
+    def get_description(self):
+        return '在 {} 年中盈利的走向图'.format(self.year)
+
+    # The get_items function is the main function here. It will define
+    # what are the contents of the box.
+    def get_items(self):
+        data = GoodsSellRecord.statistic_objects.day_statistic(self.year)
+        # value
+        days = []
+        months = []
+        for val in data:
+            # print(val)
+            # days.append([datetime.strptime(val['date'], '%Y-%m-%d'), val['profits']])
+            months.append(val['date'].split('-')[1])
+            days.append([val['date'], val['profits']])
+        print(days)
+        # monthes = []
+        # sell_counts = []
+        # average_counts = []
+        # profit_counts = []
+        # for val in data:
+        #     monthes.append(val['month'])
+        #     # sells = Decimal(val['sells']).quantize(Decimal('0.00'))
+        #     sells = round(val['sells'], 2)
+        #     sell_counts.append(sells)
+        #     averages = round(val['averages'], 2)
+        #     average_counts.append(averages)
+        #     profit_counts.append(sells - averages)
+        # values = [{'name': '销售总额', 'data': sell_counts},
+        #           {'name': '进价总额', 'data': average_counts},
+        #           {'name': '利润总额', 'data': profit_counts}]
+
+        # # Create a first item (box's content) with the machine info
+        # item_info = Item(
+        #     html_id='sell-statistic-table',
+        #     display=Item.AS_HIGHCHARTS,
+        #     # Since we use AS_TABLE display, value must be a list of tuples
+        #     value=data
+        #     ,
+        #     classes='table-bordered table-condensed '
+        #             'table-hover table-striped'
+        # )
+
+        chart_options = {
+            # 'chart': {
+            #     'type': 'spline'
+            # },
+            'title': {
+                'text': '{} 年利润走势图'.format(self.year)
+            },
+            'xAxis': {
+                'categories': months,
+                'tickInterval': 7,
+                'labels': {  # don't display the dummy year
+                    'align': 'right',
+                    'rotation': -30
+
+                },
+                'title': {
+                    'text': '间隔为1周，时间刻度月份'
+                }
+            },
+            'yAxis': {
+                'title': {
+                    'text': '数额(元)'
+                },
+                'min': 0
+            },
+            'tooltip': {
+                'headerFormat': '<b>{series.name}</b><br>',
+                'pointFormat': '{point.y:.2f}'
+            },
+            'plotOptions': {
+                'spline': {
+                    'marker': {
+                        'enabled': True
+                    }
+                }
+            }, 'credits': {
+                'enabled': False
+            },
+            'series': [{
+                'name': '利润',
+                'data': days
+
+            }]
+
+        }
+        # Create the chart item
+        item_chart = Item(
+            html_id='highchart-{}-day-statistics'.format(self.year),
+            value=chart_options,
+            display=Item.AS_HIGHCHARTS)
+
+        # Return the list of items
+        return [item_chart]
+
+# class CategoryBox(Box):
+#     def __init__(self):
+#         pass

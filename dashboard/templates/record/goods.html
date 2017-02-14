@@ -1,0 +1,27 @@
+<div class="obj-margin-right" id="obj-item-list">
+    <table class="table">
+        <thead>
+        <tr>
+            <td>名称</td>
+            <td>价格</td>
+            <td>单位</td>
+            <td>库存</td>
+            <td>购买项</td>
+        </tr>
+        </thead>
+        <tbody>
+        {% for good in goods %}
+            {% if good.remain > 0 %}
+            <tr>
+                <td>{{ good.goods_name }}</td>
+                <td><input value="{{ good.last_price }}" type="number"></td>
+                <td>{{ good.unit_name }}</td>
+                <td>{{ good.remain }}</td>
+                <td><input value="1" type="number"><a href="javascript:void(0);" class="addlink" name="{{ good.id }}">添加到清单</a>
+                </td>
+            </tr>
+            {% endif %}
+        {% endfor %}
+        </tbody>
+    </table>
+</div>

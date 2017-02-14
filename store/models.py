@@ -122,8 +122,8 @@ class GoodsAddRecord(models.Model):
     """
     增加库存的记录
     """
-    goods = models.ForeignKey(Goods, verbose_name='商品名称')
-    shop = models.ForeignKey(Shop, verbose_name='供应商')
+    goods = models.ForeignKey(Goods, verbose_name='商品名称', related_name='record_goods')
+    shop = models.ForeignKey(Shop, verbose_name='供应商', related_name='record_shop')
     number = models.DecimalField('数目', max_digits=6, decimal_places=2)
     remark = models.TextField('说明信息', blank=True, null=True)
     updater = models.ForeignKey(User, verbose_name='操作员')
@@ -147,18 +147,19 @@ class ReturnRecord(models.Model):
         (0, '操作失误'),
         (1, '退货'),
     )
-    goods = models.ForeignKey(Goods, verbose_name='商品名称')
-    shop = models.ForeignKey(Shop, verbose_name='供货商名称')
+    customer = models.ForeignKey(Customer, verbose_name='退货用户', blank=False, null=True, related_name='return_customer')
+    goods = models.ForeignKey(Goods, verbose_name='商品名称', related_name='return_goods')
+    shop = models.ForeignKey(Shop, verbose_name='供货商名称', related_name='return_shop')
     amount = models.DecimalField('数目', max_digits=6, decimal_places=2)
     type = models.IntegerField('退送原因', choices=TYPE_IN_CHOICES)
     updater = models.ForeignKey(User, verbose_name='操作员')
     date = models.DateTimeField('日期', auto_now_add=True)
     remark = models.TextField('说明信息', blank=True, null=True)
-    reset_price = models.DecimalField('还原价格', blank=True, null=True, max_digits=10, decimal_places=2)
+    reset_price = models.DecimalField('重置价格', blank=True, null=True, max_digits=10, decimal_places=2)
 
     class Meta:
-        verbose_name = '退送库存记录'
-        verbose_name_plural = '退送库存记录'
+        verbose_name = '退货处理'
+        verbose_name_plural = '退货处理'
         ordering = ['goods', 'amount']
 
     def __str__(self):
@@ -239,7 +240,10 @@ class ArrearsPrice(models.Model):
         verbose_name = '欠款记录'
         verbose_name_plural = '欠款记录'
         ordering = ['-date']
+
+
 from django.db import connection
+
 
 class SellRecordManager(models.Manager):
     def month_statistic(self, year):
@@ -267,6 +271,38 @@ class SellRecordManager(models.Manager):
                 result_list.append(p)
         return result_list
 
+    def day_statistic(self, year):
+        with connection.cursor() as cursor:
+            sql_str = "select count(t.sell_num) as count, substr(t.date,1,10) as date, " \
+                      "sum((t.sell_price  - t.average_price)* t.sell_num) as profit_total " \
+                      "from store_goodssellrecord  as t where t.date like %s group by substr(t.date,1,10);"
+            cursor.execute(sql_str, [year + '%'])
+            result_list = []
+            for row in cursor.fetchall():
+                p = {'count': row[0], 'date': row[1], 'profits': row[2]}
+                result_list.append(p)
+        return result_list
+
+from django.utils.html import format_html
+class RecordHistory(models.Model):
+    date = models.DateTimeField('日期', null=False, blank=False)
+    customer = models.ForeignKey(Customer, verbose_name='客户姓名', related_name='record_customer', null=False, blank=False)
+    report = models.ForeignKey(Report, related_name='record_report', null=True, blank=False)
+    arrears = models.ForeignKey(ArrearsPrice, related_name='record_arrears', null=True, blank=True)
+
+
+    def view_record(self):
+        return format_html('<a href="/store/view_record/{}"><i class="icon-eye-open"></i></a>'.format(self.id))
+
+    view_record.short_description = '查看订单'
+
+    def __str__(self):
+        return self.customer.user_name
+
+    class Meta:
+        verbose_name = '历史订单查看'
+        verbose_name_plural = '历史订单查看'
+        ordering = ['-date']
 
 
 class GoodsSellRecord(models.Model):
@@ -282,7 +318,7 @@ class GoodsSellRecord(models.Model):
     updater = models.ForeignKey(User, verbose_name='操作人员', related_name='admin')
     date = models.DateTimeField('日期', auto_now_add=True)
     arrears = models.ForeignKey(ArrearsPrice, verbose_name='欠款额', related_name='arrears', null=True, blank=True)
-
+    record = models.ForeignKey(RecordHistory, related_name='report_many_record', null=True, blank=False)
     # def account_actions(self, obj):
     #     return format_html(
     #         '<a class="button" href="{}">Deposit</a>&nbsp;'
@@ -294,6 +330,7 @@ class GoodsSellRecord(models.Model):
     # account_actions.short_description = 'Account Actions'
     # account_actions.allow_tags = True
     statistic_objects = SellRecordManager()
+    objects = models.Manager()
 
     @property
     def profit(self):

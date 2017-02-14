@@ -1,0 +1,4 @@
+<div id="obj-sidebar">
+    <ul>{% for cate in categories %}
+        <li value="{% url 'admin:store_order_goods-list' cate.id %}">{{ cate.name }}</li>{% endfor %}</ul>
+</div>

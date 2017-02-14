@@ -7,7 +7,9 @@ from django.utils.translation import ugettext_lazy as _
 from suit_dashboard.layout import Grid, Row, Column
 from suit_dashboard.views import DashboardView
 from suit_dashboard.box import Box
-from .box import BoxMachine,BoxSellStatistics
+from .box import BoxMachine, BoxSellStatistics, DaySellStatistics
+
+from datetime import datetime
 
 
 class HomeView(DashboardView):
@@ -16,7 +18,10 @@ class HomeView(DashboardView):
     crumbs = (
         {'url': 'admin:statistics', 'name': '统计信息'},
     )
-    grid = Grid(Row(Column(BoxSellStatistics(), width=6)))
+    current_year = str(datetime.now())[:4]
+    # current_year = '2016'
+    grid = Grid(Row(Column(BoxSellStatistics(year=current_year), width=6),
+                    Column(DaySellStatistics(year=current_year), width=6)))
 
     # template_name = 'dashboard/main.html'
     #
@@ -24,7 +29,7 @@ class HomeView(DashboardView):
     #     context = self.get_context_data(**kwargs)
     #     return self.render_to_response(context=context)
 
-
+from store.models import Category, Goods
 class SellGoodsView(DashboardView):
     template_name = 'dashboard/sells.html'
 
@@ -32,7 +37,28 @@ class SellGoodsView(DashboardView):
         {'url': 'admin:sells', 'name': '下订单'},
     )
 
-    grid = Grid()
+    # extra_context = {'categories': Category.objects.all(), 'goods': }
+
+    grid = Grid(Row(Column(
+        Box(template='record/search.html'), width=12
+    )), Row(
+        Column(
+            Box(template='record/category.html'),
+            width=2),
+        Column(
+            Box(template='record/goods.html'),
+            width=6),
+        Column(
+            Box(template='record/record.html'),
+            width=4),
+    ))
+
+    def get_context_data(self, **kwargs):
+        categories = Category.objects.all()
+        goods = Goods.objects.filter(category=categories[0])
+        context = super(SellGoodsView, self).get_context_data(**kwargs) or {}
+        context.update({'categories': categories, 'goods': goods})
+        return context
 
 
 # inheriting home view
