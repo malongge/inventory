@@ -9,7 +9,8 @@ from jsonview.views import JSONDetailView, JSONListView, PaginatedJSONListView, 
 from .models import Category, RecordHistory
 from .models import Goods, Customer
 
-from decimal import Decimal
+from .admin import Decimal
+
 def view_record(request, record_id):
     record = RecordHistory.objects.get(id=record_id)
     for sell_rcord in record.report_many_record.all():

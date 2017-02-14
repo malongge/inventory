@@ -126,8 +126,8 @@ class BoxSellStatistics(Box):
         self.year = kwargs.get('year', '2016')
         super(BoxSellStatistics, self).__init__(**kwargs)
 
-    def get_title(self):
-        return '商品盈利表'
+    # def get_title(self):
+    #     return '商品盈利表'
 
     def get_description(self):
         return '统计 {} 全年各个月份盈利情况'.format(self.year)
@@ -149,7 +149,7 @@ class BoxSellStatistics(Box):
             sell_counts.append(sells)
             averages = round(val['averages'], 2)
             average_counts.append(averages)
-            profit_counts.append(sells - averages)
+            profit_counts.append(round(sells - averages, 2))
         values = [{'name': '销售总额', 'data': sell_counts},
                   {'name': '进价总额', 'data': average_counts},
                   {'name': '利润总额', 'data': profit_counts}]
@@ -234,8 +234,8 @@ from datetime import datetime
 
 
 class DaySellStatistics(BoxSellStatistics):
-    def get_title(self):
-        return '趋势走向表'
+    # def get_title(self):
+    #     return '趋势走向表'
 
     def get_description(self):
         return '在 {} 年中盈利的走向图'.format(self.year)
@@ -252,7 +252,7 @@ class DaySellStatistics(BoxSellStatistics):
             # days.append([datetime.strptime(val['date'], '%Y-%m-%d'), val['profits']])
             months.append(val['date'].split('-')[1])
             days.append([val['date'], val['profits']])
-        print(days)
+        # print(days)
         # monthes = []
         # sell_counts = []
         # average_counts = []

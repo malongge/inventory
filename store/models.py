@@ -72,7 +72,7 @@ class Shop(InfoModel):
         verbose_name_plural = '供货商'
         ordering = ['shop_name']
 
-
+from .utils import Decimal, quantize
 class Goods(ModelServiceMixin, models.Model):
     """
     商品
@@ -101,14 +101,14 @@ class Goods(ModelServiceMixin, models.Model):
     @property
     def count(self):
         if self.num:
-            return int(self.num) * self.last_price
-        return 0
+            return quantize(self.num * self.last_price)
+        return Decimal(0)
 
     def sell_amount(self):
-        return self.remain * self.last_price
+        return quantize(self.remain * self.last_price)
 
     def in_amount(self):
-        return self.remain * self.average_price
+        return quantize(self.remain * self.average_price)
 
     def own_amount(self):
         return self.sell_amount() - self.in_amount()

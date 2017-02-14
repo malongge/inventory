@@ -167,10 +167,11 @@ class ArrearsAdmin(admin.ModelAdmin):
         qs = super(ArrearsAdmin, self).get_queryset(request)
         return qs.filter(is_arrears=False)
 
-    # def hide_none_arrears(self, request, queryset):
-    #     queryset.update(is_arrears=False)
-    #
-    # hide_none_arrears.short_description = "隐藏结清款项的用户"
+        # def hide_none_arrears(self, request, queryset):
+        #     queryset.update(is_arrears=False)
+        #
+        # hide_none_arrears.short_description = "隐藏结清款项的用户"
+
 
 @register(GoodsSellRecord)
 class GoodsSellRecordAdmin(UpdaterAdmin):
@@ -223,6 +224,7 @@ class RecordHistoryAdmin(admin.ModelAdmin):
 
 
 import datetime
+from .utils import Decimal
 
 
 @register(Order)
@@ -302,7 +304,7 @@ class OrderAdmin(OrderMixin, admin.ModelAdmin):
     @transaction.atomic
     def report_view(self, request):
         data = []
-        all_price = 0.0
+        all_price = Decimal(0)
         cell_num = 0  # 增加一些空的行
         code = 1  # 增加一行序号列
         if request.POST.get('data_list', None) is None:
@@ -334,7 +336,7 @@ class OrderAdmin(OrderMixin, admin.ModelAdmin):
 
         cust = Customer.objects.get(user_name=name)
         if arr.strip():
-            arr = float(arr)
+            arr = Decimal(float(arr))
             ap = ArrearsPrice.objects.create(arrears_price=arr, customer=cust)
         else:
             ap = None
@@ -343,9 +345,9 @@ class OrderAdmin(OrderMixin, admin.ModelAdmin):
         record = RecordHistory.objects.create(customer=cust, report=default_report, arrears=ap, date=date)
         for key, value in data_all['list_data'].items():
             g = Goods.objects.get(id=key)
-            g.num = value['num']
+            g.num = Decimal(value['num'])
             g.code = code
-            price = float(value['price'])
+            price = Decimal(value['price'])
             all_price += g.num * price
             g.remain = g.remain - g.num
             g.save()
@@ -363,8 +365,10 @@ class OrderAdmin(OrderMixin, admin.ModelAdmin):
             arr_p = ap.arrears_price
         else:
             arr_p = 0
-        return render(request, context={'data': data, 'report': default_report, 'price': all_price, 'customer': cust,
-                                        'arrears': arr_p,
-                                        'cell_num': range(max(13 - cell_num, 0)),
-                                        'my_time': date.strftime('%Y{}%m{}%d{}').format('年', '月', '日')},
+        return render(request,
+                      context={'data': data, 'report': default_report, 'price': all_price,
+                               'customer': cust,
+                               'arrears': arr_p,
+                               'cell_num': range(max(13 - cell_num, 0)),
+                               'my_time': date.strftime('%Y{}%m{}%d{}').format('年', '月', '日')},
                       template_name=self.report_template)

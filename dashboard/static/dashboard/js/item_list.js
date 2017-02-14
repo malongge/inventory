@@ -83,7 +83,7 @@
                 data['arrears'] = that.dom.arrearsPrice.val();
                 try{
                 if (data['arrears']){
-                    parseFloat(data['arrears'])
+                    parseFloat(data['arrears']).toPrecision(3)
                 }
             }
             catch(Exception){
@@ -227,7 +227,7 @@
         add_item: function (addLink) {
             var tr_obj = {};
             var name = addLink.attr('name');
-            tr_obj['num'] = parseInt(addLink.siblings().val());
+            tr_obj['num'] = parseFloat(addLink.siblings().val());
             var tds = addLink.parent().siblings();
             var data = [];
             // 对于价格增加可修改项
@@ -239,14 +239,14 @@
                 }
             });
             tr_obj['alias'] = data[0];
-            tr_obj['price'] = parseFloat(data[1]);
+            tr_obj['price'] = parseFloat(data[1]).toPrecision(3);
 
-            if (tr_obj['num'] < 0.01 || tr_obj['num'] > parseInt(data[3])) {
+            if (tr_obj['num'] < 0.01 || tr_obj['num'] > parseFloat(data[3]).toPrecision(3)) {
                 that.showErrorNote('购买的数量不能为0，也不能大于库存的数量');
             }
             else {
                 // 库存数量应该是减去当前选中的量
-                tr_obj['store_num'] = parseInt(data[3]) - tr_obj['num'];
+                tr_obj['store_num'] = parseFloat(data[3]).toPrecision(3) - tr_obj['num'];
 
                 // 当用户选择已经存在的项时，直接修改已有的项
                 if (name in this.cache_items){

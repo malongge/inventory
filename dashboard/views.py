@@ -19,9 +19,11 @@ class HomeView(DashboardView):
         {'url': 'admin:statistics', 'name': '统计信息'},
     )
     current_year = str(datetime.now())[:4]
-    # current_year = '2016'
+    last_year = str(int(current_year) - 1)
     grid = Grid(Row(Column(BoxSellStatistics(year=current_year), width=6),
-                    Column(DaySellStatistics(year=current_year), width=6)))
+                    Column(DaySellStatistics(year=current_year), width=6)),
+                Row(Column(BoxSellStatistics(year=last_year), width=6),
+                    Column(DaySellStatistics(year=last_year), width=6)))
 
     # template_name = 'dashboard/main.html'
     #
@@ -29,7 +31,10 @@ class HomeView(DashboardView):
     #     context = self.get_context_data(**kwargs)
     #     return self.render_to_response(context=context)
 
+
 from store.models import Category, Goods
+
+
 class SellGoodsView(DashboardView):
     template_name = 'dashboard/sells.html'
 
