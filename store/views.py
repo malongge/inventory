@@ -11,6 +11,7 @@ from .models import Goods, Customer
 
 from .admin import Decimal
 
+
 def view_record(request, record_id):
     record = RecordHistory.objects.get(id=record_id)
     for sell_rcord in record.report_many_record.all():
@@ -39,7 +40,8 @@ def view_record(request, record_id):
 
     return render(request, context={'data': data, 'report': default_report, 'price': all_price, 'customer': cust,
                                     'arrears': ap,
-                                    'cell_num': range(max(13 - cell_num, 0)), 'my_time': record.date.strftime('%Y{}%m{}%d{}').format('年', '月', '日')},
+                                    'cell_num': range(max(13 - cell_num, 0)),
+                                    'my_time': record.date.strftime('%Y{}%m{}%d{}').format('年', '月', '日')},
                   template_name='admin/liuzhiping/report.html')
 
 

@@ -1,23 +1,25 @@
+import datetime
 import json
 
+from django.conf.urls import url
 from django.contrib import admin
 from django.contrib.admin import register
+from django.core import serializers
+from django.core.urlresolvers import reverse
 from django.db import transaction
-from django.utils.safestring import mark_safe
-from django.utils.translation import ugettext_lazy as _
-from django.conf.urls import url
+from django.db.models import Q
+from django.http import HttpResponseRedirect
 from django.http.response import HttpResponse
 from django.shortcuts import render
-from django.http import HttpResponseRedirect
-from django.core.urlresolvers import reverse
-from django.db.models import Q
-from django.core import serializers
+from django.utils.safestring import mark_safe
+from django.utils.translation import ugettext_lazy as _
 
 from store.forms import AddRecordAdminForm, ReturnRecordForm
 from .models import (Goods, Customer, Category,
                      GoodsAddRecord, GoodsSellRecord, Shop,
                      ArrearsPrice, TransferGoods, Report,
                      Order, ReturnRecord, RecordHistory)
+from .utils import Decimal
 
 
 class UpdaterAdmin(admin.ModelAdmin):
@@ -221,10 +223,6 @@ class OrderMixin(object):
 @register(RecordHistory)
 class RecordHistoryAdmin(admin.ModelAdmin):
     list_display = ('customer', 'date', 'view_record')
-
-
-import datetime
-from .utils import Decimal
 
 
 @register(Order)

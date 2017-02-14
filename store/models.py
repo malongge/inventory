@@ -1,5 +1,9 @@
 from django.contrib.auth.models import User
+from django.db import connection
 from django.db import models
+from django.utils.html import format_html
+
+from .utils import Decimal, quantize
 
 
 class InfoModel(models.Model):
@@ -72,7 +76,7 @@ class Shop(InfoModel):
         verbose_name_plural = '供货商'
         ordering = ['shop_name']
 
-from .utils import Decimal, quantize
+
 class Goods(ModelServiceMixin, models.Model):
     """
     商品
@@ -226,6 +230,7 @@ class Order(models.Model):
         verbose_name_plural = '订单记录'
         ordering = ['-date']
 
+
 class ArrearsPrice(models.Model):
     arrears_price = models.DecimalField('欠款额', max_digits=10, decimal_places=2)
     customer = models.ForeignKey(Customer, verbose_name='客户姓名')
@@ -239,9 +244,6 @@ class ArrearsPrice(models.Model):
         verbose_name = '欠款记录'
         verbose_name_plural = '欠款记录'
         ordering = ['-date']
-
-
-from django.db import connection
 
 
 class SellRecordManager(models.Manager):
@@ -282,13 +284,12 @@ class SellRecordManager(models.Manager):
                 result_list.append(p)
         return result_list
 
-from django.utils.html import format_html
+
 class RecordHistory(models.Model):
     date = models.DateTimeField('日期', null=False, blank=False)
     customer = models.ForeignKey(Customer, verbose_name='客户姓名', related_name='record_customer', null=False, blank=False)
     report = models.ForeignKey(Report, related_name='record_report', null=True, blank=False)
     arrears = models.ForeignKey(ArrearsPrice, related_name='record_arrears', null=True, blank=True)
-
 
     def view_record(self):
         return format_html('<a href="/store/view_record/{}"><i class="icon-eye-open"></i></a>'.format(self.id))
