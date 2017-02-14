@@ -226,7 +226,6 @@ class Order(models.Model):
         verbose_name_plural = '订单记录'
         ordering = ['-date']
 
-
 class ArrearsPrice(models.Model):
     arrears_price = models.DecimalField('欠款额', max_digits=10, decimal_places=2)
     customer = models.ForeignKey(Customer, verbose_name='客户姓名')
