@@ -19,7 +19,7 @@ from .models import (Goods, Customer, Category,
                      GoodsAddRecord, GoodsSellRecord, Shop,
                      ArrearsPrice, TransferGoods, Report,
                      Order, ReturnRecord, RecordHistory)
-from .utils import Decimal
+from .utils import Decimal, quantize
 
 
 class UpdaterAdmin(admin.ModelAdmin):
@@ -364,7 +364,7 @@ class OrderAdmin(OrderMixin, admin.ModelAdmin):
         else:
             arr_p = 0
         return render(request,
-                      context={'data': data, 'report': default_report, 'price': all_price,
+                      context={'data': data, 'report': default_report, 'price': quantize(all_price),
                                'customer': cust,
                                'arrears': arr_p,
                                'cell_num': range(max(13 - cell_num, 0)),
