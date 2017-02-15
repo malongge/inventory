@@ -24,10 +24,11 @@ class JSONResponse(HttpResponse):
                  encoding="utf-8", *args, **kwargs):
         json_opts = json_opts or {}
         serialize_opts = kwargs.pop('serialize_opts', {})
+        json_opts.update(serialize_opts)
         if content:
-            content = dumps(content, **json_opts, **serialize_opts)
+            content = dumps(content, **json_opts)
         else:
-            content = dumps([], **json_opts, **serialize_opts)
+            content = dumps([], **json_opts)
 
         content_type = "%s; charset=%s" % (mimetype, encoding)
         super(JSONResponse, self).__init__(content, content_type,
