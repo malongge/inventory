@@ -83,7 +83,7 @@
                 data['arrears'] = that.dom.arrearsPrice.val();
                 try{
                 if (data['arrears']){
-                    parseFloat(data['arrears']).toPrecision(3)
+                    parseFloat(data['arrears'])
                 }
             }
             catch(Exception){
@@ -239,14 +239,14 @@
                 }
             });
             tr_obj['alias'] = data[0];
-            tr_obj['price'] = parseFloat(data[1]).toPrecision(3);
+            tr_obj['price'] = parseFloat(data[1]);
 
-            if (tr_obj['num'] < 0.01 || tr_obj['num'] > parseFloat(data[3]).toPrecision(3)) {
+            if (tr_obj['num'] < 0.01 || tr_obj['num'] > parseFloat(data[3])) {
                 that.showErrorNote('购买的数量不能为0，也不能大于库存的数量');
             }
             else {
                 // 库存数量应该是减去当前选中的量
-                tr_obj['store_num'] = parseFloat(data[3]).toPrecision(3) - tr_obj['num'];
+                tr_obj['store_num'] = parseFloat(data[3]) - tr_obj['num'];
 
                 // 当用户选择已经存在的项时，直接修改已有的项
                 if (name in this.cache_items){
@@ -265,7 +265,7 @@
                 report.forEach(function (val) {
                     append += '<td>' + val + '</td>';
                 });
-                append += '<td><a href="javascript:void(0);" class="deletelink" name="'+name+'"></a></td></tr>';
+                append += '<td><a href="javascript:void(0);" class="deletelink" name="'+name+'"><i class="icon-remove-sign"></i></a></td></tr>';
                 this.dom.reportListTb.append(append);
                 }
                 // 将添加的元素放到对象中

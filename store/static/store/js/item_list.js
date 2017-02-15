@@ -76,7 +76,7 @@
                 var data = {};
                 data['user'] = that.dom.userNameLabel.text();
                 if (!data['user']){
-                    alert('请选择一个客户，然后再打印')
+                    alert('请选择一个客户，然后再打印');
                     return
                 }
 
