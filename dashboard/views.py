@@ -1,15 +1,13 @@
 # -*- coding: utf-8 -*-
 
 from __future__ import unicode_literals
-from django.views.generic import TemplateView
-from django.shortcuts import render
-from django.utils.translation import ugettext_lazy as _
-from suit_dashboard.layout import Grid, Row, Column
-from suit_dashboard.views import DashboardView
-from suit_dashboard.box import Box
-from .box import BoxMachine, BoxSellStatistics, DaySellStatistics
 
 from datetime import datetime
+
+from suit_dashboard.box import Box
+from suit_dashboard.layout import Grid, Row, Column
+from suit_dashboard.views import DashboardView
+from .box import BoxSellStatistics, DaySellStatistics
 
 
 class HomeView(DashboardView):
