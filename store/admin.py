@@ -24,8 +24,9 @@ from .utils import Decimal, quantize
 
 class UpdaterAdmin(admin.ModelAdmin):
     def save_model(self, request, obj, form, change):
-        if getattr(obj, 'updater', None) is None and request.user:
-            obj.updater = request.user
+        if request.user:
+            if getattr(obj, 'updater', None) is None:
+                obj.updater = request.user
         else:
             raise PermissionError(_('you must login or give a operator.'))
         return super(UpdaterAdmin, self).save_model(request, obj, form, change)
