@@ -164,5 +164,6 @@ SUIT_CONFIG = {
         # {'app': 'store', 'icon': 'icon-chevron-right', 'models': '__all__'},
         {'label': '下订单', 'icon': 'icon-fire', 'url': '/admin/sells'},
         {'label': '统计信息', 'icon': 'icon-question-sign', 'url': '/admin/statistics'},
+        {'label': '库存统计', 'icon': 'icon-glass', 'url': '/admin/remain'},
     ),
 }

@@ -1,6 +1,6 @@
 from __future__ import unicode_literals
 
-from store.models import GoodsSellRecord
+from store.models import GoodsSellRecord, Goods
 from suit_dashboard.box import Box, Item
 
 
@@ -326,6 +326,65 @@ class DaySellStatistics(BoxSellStatistics):
         # Return the list of items
         return [item_chart]
 
+
 # class CategoryBox(Box):
 #     def __init__(self):
 #         pass
+class RemainStatisticBox(Box):
+    def get_description(self):
+        return '库存统计图'
+
+
+
+    def get_items(self):
+        ret = Goods.statistic_objects.remain_statistic()
+        print(ret)
+        sum_remain = sum([sum(val['data']) for val in ret['value']])
+        chart_options = {
+            # 'chart': {
+            #     'type': 'bar'
+            # },
+            'title': {
+                'text': '按年统计库存'
+            },
+            'subtitle': {
+                'text': '总库存量 {}'.format(sum_remain)
+            },
+            'xAxis': {
+                'categories': ret['x']},
+            'yAxis': {
+                'title': {
+                    'text': '价格 (￥)'
+                },
+                # 'plotLines': [{
+                #     'value': 0,
+                #     'width': 10000,
+                #     # 'color': '#808080'
+                # }]
+            },
+            'tooltip': {
+                # 'headerFormat': '<b>{point.x}月份</b><br>',
+                # 'valuePrefix': '￥',
+                'valueSuffix': '元'
+            },
+            'legend': {
+                'layout': 'vertical',
+                'align': 'right',
+                'verticalAlign': 'middle',
+                'borderWidth': 1,
+                # 'backgroundColor': "((Highcharts.theme && Highcharts.theme.legendBackgroundColor) || '#FFFFFF')",
+                'shadow': True
+            },
+            'credits': {
+                'enabled': False
+            },
+            'series': ret['value']
+        }
+
+        item_chart = Item(
+            html_id='highchart-remain-statistics',
+            value=chart_options,
+            display=Item.AS_HIGHCHARTS)
+
+        # Return the list of items
+        return [item_chart]

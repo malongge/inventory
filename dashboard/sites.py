@@ -3,7 +3,7 @@
 from __future__ import unicode_literals
 from django.contrib.admin.sites import AdminSite
 from django.conf.urls import url
-from dashboard.views import HomeView, LogsMenu, SellGoodsView
+from dashboard.views import HomeView, LogsMenu, SellGoodsView, RemainStatisticsView
 
 
 # class AdminMixin(object):
@@ -26,12 +26,14 @@ class DashboardSite(AdminSite):
     A Django AdminSite with the AdminMixin to allow registering custom
     dashboard view.
     """
+
     def get_urls(self):
         """Add dashboard view to admin urlconf."""
         urls = super(DashboardSite, self).get_urls()
         custom_urls = [
             url(r'^statistics$', self.admin_view(HomeView.as_view()), name='statistics$'),
-            url(r'^sells$', self.admin_view(SellGoodsView.as_view()), name='sells')
+            url(r'^sells$', self.admin_view(SellGoodsView.as_view()), name='sells'),
+            url(r'^remain$', self.admin_view(RemainStatisticsView.as_view()), name='remain'),
         ]
 
         # del urls[0]

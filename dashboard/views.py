@@ -7,7 +7,7 @@ from datetime import datetime
 from suit_dashboard.box import Box
 from suit_dashboard.layout import Grid, Row, Column
 from suit_dashboard.views import DashboardView
-from .box import BoxSellStatistics, DaySellStatistics
+from .box import BoxSellStatistics, DaySellStatistics, RemainStatisticBox
 
 
 class HomeView(DashboardView):
@@ -105,3 +105,46 @@ class LogsMenu(HomeView):
                 width=4),
         )
     )
+
+
+class RemainStatisticsView(DashboardView):
+    template_name = 'dashboard/main.html'
+    # crumbs = {'url': 'admin:remain', 'name': '库存统计'}
+    # grid = Grid(
+    #     Row(
+    #         Column(
+    #             Box(title='Row 1 column 1 box 1'),
+    #             Box(title='Row 1 column 1 box 2'),
+    #             width=6),
+    #         Column(
+    #             Box(title='Row 1 column 2 box 1'),
+    #             Box(title='Row 1 column 2 box 2'),
+    #             width=6),
+    #     ),
+    #     Row(
+    #         Column(
+    #             Box(title='Row 2 column 1 box 1'),
+    #             Box(title='Row 2 column 1 box 2'),
+    #             width=3),
+    #         Column(
+    #             Box(title='Row 2 column 2 box 1'),
+    #             Box(title='Row 2 column 2 box 2'),
+    #             width=5),
+    #         Column(
+    #             Row(
+    #                 Column(
+    #                     Box(title='R2 C3 R1 C1 B1'),
+    #                     Box(title='R2 C3 R1 C1 B2'),
+    #                     width=12)
+    #             ),
+    #             Row(
+    #                 Column(
+    #                     Box(title='R2 C3 R2 C1 B1'),
+    #                     Box(title='R2 C3 R2 C1 B2'),
+    #                     width=12)
+    #             ),
+    #             width=4),
+    #     )
+    # )
+
+    grid = Grid(Row(Column(RemainStatisticBox())))

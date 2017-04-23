@@ -77,6 +77,34 @@ class Shop(InfoModel):
         ordering = ['shop_name']
 
 
+from datetime import datetime
+
+
+class GoodsManager(models.Manager):
+    def remain_statistic(self):
+        current_year = datetime.now().year
+        check_count_sql = "select count(id) from store_goods as t where t.update_date like '{}%';"
+        statistic_sql = "select sum(t.remain *  t.average_price) from store_goods as t where t.update_date like '{}%';"
+
+        with connection.cursor() as cursor:
+            # import pdb
+            # pdb.set_trace()
+            ret = []
+            years = []
+            for year in range(current_year - 4, current_year + 1):
+                cursor.execute(check_count_sql.format(year))
+                rows = cursor.fetchall()
+                if rows[0][0] == 0:
+                    continue
+
+                cursor.execute(statistic_sql.format(year))
+                rows = cursor.fetchall()
+                ret.append(round(rows[0][0], 2))
+                years.append(year)
+
+        return {'value': [{'name': '统计到小数点后两位', 'data': ret}], 'x': years}
+
+
 class Goods(ModelServiceMixin, models.Model):
     """
     商品
@@ -93,6 +121,9 @@ class Goods(ModelServiceMixin, models.Model):
     shop = models.ForeignKey(Shop, verbose_name='供应商名称', blank=True, null=True)
     remain = models.DecimalField('数目', max_digits=6, decimal_places=2, default=0)
     last_time = models.DateField('有效期', blank=True, null=True)
+
+    statistic_objects = GoodsManager()
+    objects = models.Manager()
 
     def __str__(self):
         return self.goods_name
