@@ -368,6 +368,6 @@ class OrderAdmin(OrderMixin, admin.ModelAdmin):
                       context={'data': data, 'report': default_report, 'price': quantize(all_price),
                                'customer': cust,
                                'arrears': arr_p,
-                               'cell_num': range(max(13 - cell_num, 0)),
+                               'cell_num': range(max(11 - cell_num, 0)),
                                'my_time': date.strftime('%Y{}%m{}%d{}').format('年', '月', '日')},
                       template_name=self.report_template)
