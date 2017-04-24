@@ -168,7 +168,7 @@ class BoxSellStatistics(Box):
                 'text': '{} 全年盈利图表'.format(self.year)
             },
             'subtitle': {
-                'text': '全年总销售额--{} ,总利润--{}'.format(sum(sell_counts), sum(profit_counts))
+                'text': '全年总销售额--{} ,总利润--{}'.format(round(sum(sell_counts), 2), round(sum(profit_counts), 2))
             },
             'xAxis': {
                 'categories': monthes,

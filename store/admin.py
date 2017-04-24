@@ -165,6 +165,7 @@ class TransferGoodsAdmin(UpdaterAdmin):
 class ArrearsAdmin(admin.ModelAdmin):
     # actions = ['hide_none_arrears']
     list_display = ('arrears_price', 'customer', 'is_arrears', 'date')
+    search_fields = ['customer__user_name']
 
     def get_queryset(self, request):
         qs = super(ArrearsAdmin, self).get_queryset(request)
