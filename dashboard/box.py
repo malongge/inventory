@@ -327,14 +327,9 @@ class DaySellStatistics(BoxSellStatistics):
         return [item_chart]
 
 
-# class CategoryBox(Box):
-#     def __init__(self):
-#         pass
 class RemainStatisticBox(Box):
     def get_description(self):
         return '库存统计图'
-
-
 
     def get_items(self):
         ret = Goods.statistic_objects.remain_statistic()
