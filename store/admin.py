@@ -201,6 +201,7 @@ class GoodsSellRecordAdmin(UpdaterAdmin):
     available_data.allow_tags = True
 
 
+@register(Report)
 class ReportAdmin(admin.ModelAdmin):
     list_display = ('title', 'alias', 'ad', 'phone', 'address', 'remark', 'date',
                     'tag')
