@@ -16,7 +16,7 @@ registry.register(GoodsLookup)
 
 
 class UseSearchGoodsForm(forms.ModelForm):
-    goods = selectable.AutoCompleteSelectField(lookup_class=GoodsLookup, allow_new=False)
+    goods = selectable.AutoCompleteSelectField(lookup_class=GoodsLookup, allow_new=False, label='商品')
 
     def __init__(self, *args, **kwargs):
         super(UseSearchGoodsForm, self).__init__(*args, **kwargs)
