@@ -28,9 +28,9 @@ def view_record(request, record_id):
         g = sell_record.goods
         g.code = code
         g.num = sell_record.sell_num
-        all_price += g.count
         # 价格改变只是零时性的
         g.last_price = sell_record.sell_price
+        all_price += g.num * g.last_price
         data.append(g)
 
         cell_num += 1
